@@ -66,9 +66,14 @@ def clear():
 # Funcion para actualizar los numeros de linea
 def update_line_numbers():
     text = text_box.toPlainText()
-    line_count = text.count('\n') + 1
+    lines = text.split('\n')
+    line_count = len(lines)
     num_box.setPlainText('\n'.join(str(i + 1) for i in range(line_count)))
     num_box.verticalScrollBar().setValue(text_box.verticalScrollBar().value())
+
+# Funcion para manejar el evento de cambio de texto en el QTextEdit
+def text_changed():
+    update_line_numbers()
 
 # Funcion para manejar el evento de scroll
 def scroll_event():
@@ -144,6 +149,7 @@ text_layout.addWidget(num_box)
 text_box = QTextEdit(window)
 text_box.setPlaceholderText("Enter text here...")
 text_box.verticalScrollBar().valueChanged.connect(scroll_event)
+text_box.textChanged.connect(text_changed)
 
 # Agregar el editor de texto
 text_layout.addWidget(text_box)
