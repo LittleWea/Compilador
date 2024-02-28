@@ -184,7 +184,7 @@ for i in range(5):
     tab_widget_1.widget(i).layout = QVBoxLayout()
     tab_widget_1.widget(i).layout.addWidget(label)
     tab_widget_1.widget(i).setLayout(tab_widget_1.widget(i).layout)
-    style = "background-color:"+colorsp1[i] + ";QTabBar::tab { color: black; }"
+    style = "background-color:"+colorsp1[i] + ";QTabBar::tab { background-color: " + colorsp1[i] + " color: black; }"
     tab_widget_1.widget(i).setStyleSheet(style)
 
 # Acceder a cada uno de los tabs para cambiar sus titulos
