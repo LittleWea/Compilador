@@ -19,6 +19,19 @@ def handle_selection_change(index):
         print("Selected item:", selected_item)
     combo_box.setCurrentIndex(0)
 
+# Funcion para decidir que accion realizar al momento de compilar y/o debuggear un archivo
+def handle_selection_change_bob(index):
+    selected_item = build_options_box.currentText()
+    if selected_item == 'Compilar...':
+        print("Selected item:", selected_item)
+    elif selected_item == 'Debuggear...':
+        print("Selected item:", selected_item)
+    elif selected_item == 'Compilar and Debuggear...':
+        print("Selected item:", selected_item)
+    else:
+        print("Selected item:", selected_item)
+    build_options_box.setCurrentIndex(0)
+
 # Funcion para abrir archivos y escribir sobre el TextEdit
 def open_file():
     file_path, _ = QFileDialog.getOpenFileName(window, 'Abrir Archivo', '', 'CalebPerezScript(*.cps)')
@@ -50,6 +63,7 @@ def save():
             with open(file_path, 'w') as file:
                 file.write(text)
 
+# Funcion para limpiar el editor de texto y la ruta de algun archivo
 def clear():
     global file_path_save
     file_path_save = ''
@@ -66,12 +80,6 @@ window.setGeometry(100, 100, 600, 400)  # Posicion y tamaño de la ventana
 
 # Crear un HBoxLayout para poner los objetos de forma horizontal
 layout = QHBoxLayout(window)
-
-# Crear un Label
-label = QLabel('Hello, PyQt5!', parent=window)
-
-# Agregar el Label anterior
-layout.addWidget(label)
 
 # Crear un VBoxLayout los cuales organizaran sus contenidos de forma vertical
 left_layout = QVBoxLayout()
@@ -93,6 +101,19 @@ combo_box.currentIndexChanged.connect(handle_selection_change)
 # Añadir el ComboBox en el layout del menu
 menu_layout.addWidget(combo_box)
 
+# Crear un ComboBox para seleccionar las opciones de compilacion/debuggeo
+build_options_box = QComboBox(window)
+build_options_box.addItem('Opciones de Compilado')
+build_options_box.addItem('Compilar...')
+build_options_box.addItem('Debuggear...')
+build_options_box.addItem('Compilar and Debuggear...')
+
+# Connect the currentIndexChanged signal to the handle_selection_change function
+build_options_box.currentIndexChanged.connect(handle_selection_change_bob)
+
+# Añadir el ComboBox anterior en el layout del menu
+menu_layout.addWidget(build_options_box)
+
 # Crear un PushButton para guardar el texto en un archivo ya abierto
 open_button = QPushButton('', window)
 open_button.setIcon(QIcon('save_icon.jpg'))  # Set the icon
@@ -102,7 +123,7 @@ open_button.clicked.connect(save)
 # Agregar el boton anterior en el layout de menu
 menu_layout.addWidget(open_button)
 
-# Crear un PushButton para limpiar el texto
+# Crear un PushButton para limpiar el texto y la ruta del archivo abierto
 close_button = QPushButton('', window)
 close_button.setIcon(QIcon('delete_icon.jpg'))  # Set the icon
 close_button.setIconSize(close_button.sizeHint())
@@ -111,19 +132,39 @@ close_button.clicked.connect(clear)
 # Agregar el boton anterior en el layout de menu
 menu_layout.addWidget(close_button)
 
-#Agregar el layout del menu al layout de la izquierda
+# Agregar el layout del menu al layout de la izquierda
 left_layout.addLayout(menu_layout)
 
-# Crear un TextEdit para escribir u obtener el codigo planteado
+# Crear un HBoxLayout para manejar los EditText de num de filas y el editor de texto
+text_layout = QHBoxLayout()
+
+# Crear un TextEdit para mostrar el numero de filas en el editor de texto
+num_box = QTextEdit(window)
+num_box.setPlaceholderText("")
+num_box.setFixedWidth(15)
+num_box.setReadOnly(True)
+
+# Añadir el TextEdit anterior
+text_layout.addWidget(num_box)
+
+# Crear el EditText para manejar el editor de texto
 text_box = QTextEdit(window)
 text_box.setPlaceholderText("Enter text here...")
 
-# Agregar el TextEdit anterior en el layout izquierdo
-left_layout.addWidget(text_box)
+# Agregar el editor de texto
+text_layout.addWidget(text_box)
+
+# Agregar el Layout de editor de texto y num de columnas en el Layout izquierdo principal
+left_layout.addLayout(text_layout)
 
 # Crear dos instancias de TabWidget
 tab_widget_1 = QTabWidget()
 tab_widget_2 = QTabWidget()
+
+# Colores para los tabs y el editor de texto
+tab_widget_1.setStyleSheet("background-color: #ff0000")
+tab_widget_2.setStyleSheet("background-color: lightpink")
+text_box.setStyleSheet("background-color: lightblue")
 
 # Añadir los TabWidget anteriores al layout derecho
 right_layout.addWidget(tab_widget_1)
@@ -135,40 +176,39 @@ layout.addLayout(right_layout)
 
 # Crear los elementos para cada uno de los TabWidgets
 for i in range(5):
-    # Create a label for the tab
+    # Crear un Label para cada uno de los Tabs
     label = QLabel(f'Initial Text for Tab {i+1}')
-    # Add the label to the tab's widget
     tab_widget_1.addTab(QWidget(), f'Tab {i+1}')
     tab_widget_1.widget(i).layout = QVBoxLayout()
     tab_widget_1.widget(i).layout.addWidget(label)
     tab_widget_1.widget(i).setLayout(tab_widget_1.widget(i).layout)
 
-# Access the widget associated with each tab in tab_widget_1 and change the text of its label
-    
+# Acceder a cada uno de los tabs para cambiar sus titulos
 tab_widget_1.setTabText(0, "Lexico")
 tab_widget_1.setTabText(1, "Semantico")
 tab_widget_1.setTabText(2, "Sintactico")
 tab_widget_1.setTabText(3, "Hash Table")
 tab_widget_1.setTabText(4, "Codigo Intermedio")
 
-for i in range(4):
-    # Create a label for the tab
+# Crear los elementos para cada uno de los TabWidgets
+for i in range(2):
+    # Crear un Label para cada uno de los Tabs
     label = QLabel(f'Initial Text for Tab {i+1}')
     tab_widget_2.addTab(QWidget(), f'Tab {i+1}')
     tab_widget_2.widget(i).layout = QVBoxLayout()
     tab_widget_2.widget(i).layout.addWidget(label)
     tab_widget_2.widget(i).setLayout(tab_widget_2.widget(i).layout)
 
-tab_widget_2.setTabText(0, "Errores Lexicos")
-tab_widget_2.setTabText(1, "Errores Sintacticos")
-tab_widget_2.setTabText(2, "Errores Semanticos")
-tab_widget_2.setTabText(3, "Resultados")
+# Acceder a cada uno de los tabs para cambiar sus titulos
+tab_widget_2.setTabText(0, "Errores")
+tab_widget_2.setTabText(1, "Resultados")
 
+#Cambiar el texto interno de cada uno de los Labels de los Tabs
 for i in range(5):
     tab_widget_1.widget(i).layout.itemAt(0).widget().setText(f'New Text for Tab {i+1}')
 
-# Show the main window
+# Mostrar la ventana principal
 window.show()
 
-# Start the application's event loop
+# Comenzar la aplicacion en loop
 app.exec_()
