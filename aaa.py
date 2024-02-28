@@ -5,6 +5,8 @@ from PyQt5.QtGui import QIcon, QWheelEvent
 file_path_save = ''
 
 labels = {'lexico', 'semantico', 'sintactico', 'hash', 'codigo'}
+colorsp1 = ['#995FA3','#93509F','#8D419B','#873297','#802392']
+colorsp2 = ['#CE7B91','#B47182']
 
 class NoScrollTextEdit(QTextEdit):
     def wheelEvent(self, event: QWheelEvent):
@@ -154,9 +156,9 @@ tab_widget_1 = QTabWidget()
 tab_widget_2 = QTabWidget()
 
 # Colores para los tabs y el editor de texto
-tab_widget_1.setStyleSheet("background-color: #ff0000")
-tab_widget_2.setStyleSheet("background-color: lightpink")
-text_box.setStyleSheet("background-color: lightblue")
+#tab_widget_1.setStyleSheet("background-color: #4A4063; color: #BFACC8")
+#tab_widget_2.setStyleSheet("background-color: #4F1271; color: #BFACC8")
+text_box.setStyleSheet("background-color: #9A7CAC; color: #CFB8D7")
 
 # Añadir los TabWidget anteriores al layout derecho
 right_layout.addWidget(tab_widget_1)
@@ -174,6 +176,8 @@ for i in range(5):
     tab_widget_1.widget(i).layout = QVBoxLayout()
     tab_widget_1.widget(i).layout.addWidget(label)
     tab_widget_1.widget(i).setLayout(tab_widget_1.widget(i).layout)
+    style = "background-color:"+colorsp1[i] + ";QTabBar::tab { background-color: " + colorsp1[i] + " color: black; }"
+    tab_widget_1.widget(i).setStyleSheet(style)
 
 # Acceder a cada uno de los tabs para cambiar sus titulos
 tab_widget_1.setTabText(0, "Lexico")
@@ -190,6 +194,8 @@ for i in range(2):
     tab_widget_2.widget(i).layout = QVBoxLayout()
     tab_widget_2.widget(i).layout.addWidget(label)
     tab_widget_2.widget(i).setLayout(tab_widget_2.widget(i).layout)
+    style = "background-color:"+colorsp2[i] + ";QTabBar::tab { color: black; }"
+    tab_widget_2.widget(i).setStyleSheet(style)
 
 # Acceder a cada uno de los tabs para cambiar sus titulos
 tab_widget_2.setTabText(0, "Errores")
