@@ -38,6 +38,16 @@ def open_file():
             text_box.setPlainText(text)
             update_line_numbers()
 
+# Funcion para actualizar la posicion del cursor
+def update_cursor_position():
+    cursor = text_box.textCursor()
+    cursor_position = cursor.position()
+    block = text_box.document().findBlock(cursor_position)
+    cursor_position_in_block = cursor_position - block.position()
+    line_number = block.blockNumber() + 1
+    column_number = cursor_position_in_block + 1
+    cursor_position_label.setText(f'Linea: {line_number}, Columna: {column_number}')
+    
 # Funcion para abrir un archivo y mantener su ruta por si es necesario guardarlo despues
 def save_file():
     file_path, _ = QFileDialog.getSaveFileName(window, 'Guardar Archivo como', '', 'CalebPerezScript(*.cps)')
@@ -67,9 +77,14 @@ def clear():
 # Funcion para actualizar los numeros de linea
 def update_line_numbers():
     text = text_box.toPlainText()
-    line_count = text.count('\n') + 1
+    lines = text.split('\n')
+    line_count = len(lines)
     num_box.setPlainText('\n'.join(str(i + 1) for i in range(line_count)))
     num_box.verticalScrollBar().setValue(text_box.verticalScrollBar().value())
+
+# Funcion para manejar el evento de cambio de texto en el QTextEdit
+def text_changed():
+    update_line_numbers()
 
 # Funcion para manejar el evento de scroll
 def scroll_event():
@@ -149,6 +164,7 @@ Font.setPointSize(15)
 text_box.setFont(Font)
 text_box.setPlaceholderText("Enter text here...")
 text_box.verticalScrollBar().valueChanged.connect(scroll_event)
+text_box.textChanged.connect(text_changed)
 
 # Agregar el editor de texto
 text_layout.addWidget(text_box)
@@ -209,6 +225,13 @@ tab_widget_2.setTabText(1, "Resultados")
 #Cambiar el texto interno de cada uno de los Labels de los Tabs
 for i in range(5):
     tab_widget_1.widget(i).layout.itemAt(0).widget().setText(f'New Text for Tab {i+1}')
+
+# Crear un QLabel para mostrar la posicion del cursor
+cursor_position_label = QLabel('Linea: 1, Columna: 1')
+left_layout.addWidget(cursor_position_label)
+
+# Conectar el evento cursorPositionChanged al QTextEdit
+text_box.cursorPositionChanged.connect(update_cursor_position)
 
 # Mostrar la ventana principal
 window.show()
