@@ -47,6 +47,7 @@ def update_cursor_position():
     line_number = block.blockNumber() + 1
     column_number = cursor_position_in_block + 1
     cursor_position_label.setText(f'Linea: {line_number}, Columna: {column_number}')
+    
 # Funcion para abrir un archivo y mantener su ruta por si es necesario guardarlo despues
 def save_file():
     file_path, _ = QFileDialog.getSaveFileName(window, 'Guardar Archivo como', '', 'CalebPerezScript(*.cps)')
@@ -231,6 +232,7 @@ left_layout.addWidget(cursor_position_label)
 
 # Conectar el evento cursorPositionChanged al QTextEdit
 text_box.cursorPositionChanged.connect(update_cursor_position)
+
 # Mostrar la ventana principal
 window.show()
 
