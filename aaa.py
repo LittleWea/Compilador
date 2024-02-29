@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
+from PyQt5.QtGui import QIcon, QFont, QFontDatabase
 
 file_path_save = ''
 
@@ -151,6 +151,10 @@ text_layout.addWidget(num_box)
 
 # Crear el EditText para manejar el editor de texto
 text_box = QTextEdit(window)
+Font = QFont()
+Font.setFamily("Algerian")
+Font.setPointSize(15)
+text_box.setFont(Font)
 text_box.setPlaceholderText("Enter text here...")
 
 # Agregar el editor de texto
