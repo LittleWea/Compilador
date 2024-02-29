@@ -37,6 +37,15 @@ def open_file():
             text_box.setPlainText(text)
             update_line_numbers()
 
+# Funcion para actualizar la posicion del cursor
+def update_cursor_position():
+    cursor = text_box.textCursor()
+    cursor_position = cursor.position()
+    block = text_box.document().findBlock(cursor_position)
+    cursor_position_in_block = cursor_position - block.position()
+    line_number = block.blockNumber() + 1
+    column_number = cursor_position_in_block + 1
+    cursor_position_label.setText(f'Linea: {line_number}, Columna: {column_number}')
 # Funcion para abrir un archivo y mantener su ruta por si es necesario guardarlo despues
 def save_file():
     file_path, _ = QFileDialog.getSaveFileName(window, 'Guardar Archivo como', '', 'CalebPerezScript(*.cps)')
@@ -211,6 +220,12 @@ tab_widget_2.setTabText(1, "Resultados")
 for i in range(5):
     tab_widget_1.widget(i).layout.itemAt(0).widget().setText(f'New Text for Tab {i+1}')
 
+# Crear un QLabel para mostrar la posicion del cursor
+cursor_position_label = QLabel('Linea: 1, Columna: 1')
+left_layout.addWidget(cursor_position_label)
+
+# Conectar el evento cursorPositionChanged al QTextEdit
+text_box.cursorPositionChanged.connect(update_cursor_position)
 # Mostrar la ventana principal
 window.show()
 
