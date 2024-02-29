@@ -1,12 +1,17 @@
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QFont, QFontDatabase
+
+from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QIcon, QWheelEvent
 
 file_path_save = ''
 
 labels = {'lexico', 'semantico', 'sintactico', 'hash', 'codigo'}
 colorsp1 = ['#995FA3','#93509F','#8D419B','#873297','#802392']
 colorsp2 = ['#CE7B91','#B47182']
+
+class NoScrollTextEdit(QTextEdit):
+    def wheelEvent(self, event: QWheelEvent):
+        pass  # Ignore wheel events
 
 # Funcion para manejar el cambio de la seleccion de opciones
 def handle_selection_change(index):
@@ -21,19 +26,6 @@ def handle_selection_change(index):
         print("Selected item:", selected_item)
     combo_box.setCurrentIndex(0)
 
-# Funcion para decidir que accion realizar al momento de compilar y/o debuggear un archivo
-def handle_selection_change_bob(index):
-    selected_item = build_options_box.currentText()
-    if selected_item == 'Compilar...':
-        print("Selected item:", selected_item)
-    elif selected_item == 'Debuggear...':
-        print("Selected item:", selected_item)
-    elif selected_item == 'Compilar and Debuggear...':
-        print("Selected item:", selected_item)
-    else:
-        print("Selected item:", selected_item)
-    build_options_box.setCurrentIndex(0)
-
 # Funcion para abrir archivos y escribir sobre el TextEdit
 def open_file():
     file_path, _ = QFileDialog.getOpenFileName(window, 'Abrir Archivo', '', 'CalebPerezScript(*.cps)')
@@ -44,6 +36,7 @@ def open_file():
         with open(file_path, 'r') as file:
             text = file.read()
             text_box.setPlainText(text)
+            update_line_numbers()
 
 # Funcion para abrir un archivo y mantener su ruta por si es necesario guardarlo despues
 def save_file():
@@ -70,6 +63,17 @@ def clear():
     global file_path_save
     file_path_save = ''
     text_box.clear()
+
+# Funcion para actualizar los numeros de linea
+def update_line_numbers():
+    text = text_box.toPlainText()
+    line_count = text.count('\n') + 1
+    num_box.setPlainText('\n'.join(str(i + 1) for i in range(line_count)))
+    num_box.verticalScrollBar().setValue(text_box.verticalScrollBar().value())
+
+# Funcion para manejar el evento de scroll
+def scroll_event():
+    update_line_numbers()
 
 # Creacion de una instancia de Application
 app = QApplication([])
@@ -103,19 +107,6 @@ combo_box.currentIndexChanged.connect(handle_selection_change)
 # Añadir el ComboBox en el layout del menu
 menu_layout.addWidget(combo_box)
 
-# Crear un ComboBox para seleccionar las opciones de compilacion/debuggeo
-build_options_box = QComboBox(window)
-build_options_box.addItem('Opciones de Compilado')
-build_options_box.addItem('Compilar...')
-build_options_box.addItem('Debuggear...')
-build_options_box.addItem('Compilar and Debuggear...')
-
-# Connect the currentIndexChanged signal to the handle_selection_change function
-build_options_box.currentIndexChanged.connect(handle_selection_change_bob)
-
-# Añadir el ComboBox anterior en el layout del menu
-menu_layout.addWidget(build_options_box)
-
 # Crear un PushButton para guardar el texto en un archivo ya abierto
 open_button = QPushButton('', window)
 open_button.setIcon(QIcon('save_icon.jpg'))  # Set the icon
@@ -141,10 +132,11 @@ left_layout.addLayout(menu_layout)
 text_layout = QHBoxLayout()
 
 # Crear un TextEdit para mostrar el numero de filas en el editor de texto
-num_box = QTextEdit(window)
+num_box = NoScrollTextEdit(window)
 num_box.setPlaceholderText("")
-num_box.setFixedWidth(15)
+num_box.setFixedWidth(45)
 num_box.setReadOnly(True)
+num_box.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff) # Disable vertical scrollbar
 
 # Añadir el TextEdit anterior
 text_layout.addWidget(num_box)
@@ -156,6 +148,7 @@ Font.setFamily("Algerian")
 Font.setPointSize(15)
 text_box.setFont(Font)
 text_box.setPlaceholderText("Enter text here...")
+text_box.verticalScrollBar().valueChanged.connect(scroll_event)
 
 # Agregar el editor de texto
 text_layout.addWidget(text_box)
