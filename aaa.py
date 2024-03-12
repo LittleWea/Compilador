@@ -159,8 +159,10 @@ text_layout.addWidget(num_box)
 # Crear el EditText para manejar el editor de texto
 text_box = QTextEdit(window)
 Font = QFont()
-Font.setFamily("Algerian")
-Font.setPointSize(15)
+fontf = QFontDatabase()
+print(fontf.families())
+Font.setFamily("Cascadia Code SemiLight")
+Font.setPointSize(10)
 text_box.setFont(Font)
 text_box.setPlaceholderText("Enter text here...")
 text_box.verticalScrollBar().valueChanged.connect(scroll_event)
@@ -179,7 +181,7 @@ tab_widget_2 = QTabWidget()
 # Colores para los tabs y el editor de texto
 #tab_widget_1.setStyleSheet("background-color: #4A4063; color: #BFACC8")
 #tab_widget_2.setStyleSheet("background-color: #4F1271; color: #BFACC8")
-text_box.setStyleSheet("background-color: #9A7CAC; color: #CFB8D7")
+text_box.setStyleSheet("background-color: #9A7CAC; color: #FFFFFF")
 
 # Añadir los TabWidget anteriores al layout derecho
 right_layout.addWidget(tab_widget_1)
