@@ -2,8 +2,17 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBo
 from PyQt5.QtCore import Qt
 
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QIcon, QWheelEvent
+from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
+from PyQt5 import QtMultimedia, QtCore
 
-file_path_save = ''
+import os
+
+from PyQt5.QtMultimedia import QSound
+from PyQt5.QtCore import QUrl
+
+
+
+file_path_save = os.path.join(os.getcwd(), 'default.cps')
 
 labels = {'lexico', 'semantico', 'sintactico', 'hash', 'codigo'}
 colorsp1 = ['#995FA3','#93509F','#8D419B','#873297','#802392']
@@ -61,17 +70,17 @@ def save_file():
 # Funcion para guardar el contenido sobre una ruta ya especificada antes
 def save():
     global file_path_save
-    if file_path_save != '':
-        file_path = file_path_save
-        if file_path:
-            text = text_box.toPlainText()
-            with open(file_path, 'w') as file:
-                file.write(text)
+    file_path = file_path_save
+
+    if file_path:
+        text = text_box.toPlainText()
+        with open(file_path, 'w') as file:
+            file.write(text)
 
 # Funcion para limpiar el editor de texto y la ruta de algun archivo
 def clear():
     global file_path_save
-    file_path_save = ''
+    file_path_save = os.path.join(os.getcwd(), 'default.cps')
     text_box.clear()
 
 # Funcion para actualizar los numeros de linea
