@@ -1,6 +1,5 @@
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog, QScrollArea
 from PyQt5.QtCore import Qt
-
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QIcon, QWheelEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5 import QtMultimedia, QtCore
@@ -10,6 +9,7 @@ import os
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
 
+from analLexico import lexer
 
 
 file_path_save = os.path.join(os.getcwd(), 'default.cps')
@@ -83,6 +83,17 @@ def clear():
     file_path_save = os.path.join(os.getcwd(), 'default.cps')
     text_box.clear()
 
+def lexic_anal():
+    text = text_box.toPlainText()
+    tokens = lexer(text)
+    print(tokens)
+    text = ''
+    for token in tokens:
+        text += "'" + token + "'\n"
+
+    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text)
+
+
 # Funcion para actualizar los numeros de linea
 def update_line_numbers():
     text = text_box.toPlainText()
@@ -135,6 +146,7 @@ menu_layout.addWidget(combo_box)
 open_button = QPushButton('', window)
 open_button.setIcon(QIcon('save_icon.jpg'))  # Set the icon
 open_button.setIconSize(open_button.sizeHint())
+open_button.setToolTip('Save')
 open_button.clicked.connect(save)
 
 # Agregar el boton anterior en el layout de menu
@@ -144,10 +156,21 @@ menu_layout.addWidget(open_button)
 close_button = QPushButton('', window)
 close_button.setIcon(QIcon('delete_icon.jpg'))  # Set the icon
 close_button.setIconSize(close_button.sizeHint())
+close_button.setToolTip('Clear')
 close_button.clicked.connect(clear)
 
 # Agregar el boton anterior en el layout de menu
 menu_layout.addWidget(close_button)
+
+# Crear un PushButton para realizar el analisis lexico del texto
+lexic_button = QPushButton('', window)
+lexic_button.setIcon(QIcon('lex_icon.jpg'))  # Set the icon
+lexic_button.setIconSize(close_button.sizeHint())
+lexic_button.setToolTip('Lexic')
+lexic_button.clicked.connect(lexic_anal)
+
+# Agregar el boton anterior en el layout de menu
+menu_layout.addWidget(lexic_button)
 
 # Agregar el layout del menu al layout de la izquierda
 left_layout.addLayout(menu_layout)
@@ -160,6 +183,10 @@ num_box = NoScrollTextEdit(window)
 num_box.setPlaceholderText("")
 num_box.setFixedWidth(45)
 num_box.setReadOnly(True)
+Font_num_box = QFont()
+Font_num_box.setFamily("Cascadia Code SemiLight")
+Font_num_box.setPointSize(11)
+num_box.setFont(Font_num_box)
 num_box.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff) # Disable vertical scrollbar
 
 # Añadir el TextEdit anterior
@@ -169,9 +196,9 @@ text_layout.addWidget(num_box)
 text_box = QTextEdit(window)
 Font = QFont()
 fontf = QFontDatabase()
-print(fontf.families())
+#print(fontf.families())
 Font.setFamily("Cascadia Code SemiLight")
-Font.setPointSize(10)
+Font.setPointSize(11)
 text_box.setFont(Font)
 text_box.setPlaceholderText("Enter text here...")
 text_box.verticalScrollBar().valueChanged.connect(scroll_event)
@@ -188,8 +215,6 @@ tab_widget_1 = QTabWidget()
 tab_widget_2 = QTabWidget()
 
 # Colores para los tabs y el editor de texto
-#tab_widget_1.setStyleSheet("background-color: #4A4063; color: #BFACC8")
-#tab_widget_2.setStyleSheet("background-color: #4F1271; color: #BFACC8")
 text_box.setStyleSheet("background-color: #9A7CAC; color: #FFFFFF")
 
 # Añadir los TabWidget anteriores al layout derecho
@@ -204,12 +229,15 @@ layout.addLayout(right_layout)
 for i in range(5):
     # Crear un Label para cada uno de los Tabs
     label = QLabel(f'Initial Text for Tab {i+1}')
-    tab_widget_1.addTab(QWidget(), f'Tab {i+1}')
+    scroll_area = QScrollArea()
+    scroll_area.setWidgetResizable(True)
+    scroll_area.setWidget(label)
+    tab_widget_1.addTab(scroll_area, f'Tab {i+1}')
     tab_widget_1.widget(i).layout = QVBoxLayout()
-    tab_widget_1.widget(i).layout.addWidget(label)
+    tab_widget_1.widget(i).layout.addWidget(label)  # Add label to the scroll area's layout
     tab_widget_1.widget(i).setLayout(tab_widget_1.widget(i).layout)
     style = "background-color:"+colorsp1[i] + ";QTabBar::tab { background-color: " + colorsp1[i] + " color: black; }"
-    tab_widget_1.widget(i).setStyleSheet(style)
+    tab_widget_1.setStyleSheet(style)  # Set stylesheet for the tab widget
 
 # Acceder a cada uno de los tabs para cambiar sus titulos
 tab_widget_1.setTabText(0, "Lexico")
