@@ -131,6 +131,11 @@ def update_line_numbers():
 # Funcion para manejar el evento de cambio de texto en el QTextEdit
 def text_changed():
     update_line_numbers()
+      # Obtener el texto actual del QTextEdit
+    #text = text_box.toPlainText()
+
+    # Aplicar el análisis léxico y obtener el texto formateado con colores
+    #lexic_anal()
     
 
 # Funcion para manejar el evento de scroll
