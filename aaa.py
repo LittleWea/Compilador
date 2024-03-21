@@ -86,13 +86,38 @@ def clear():
 def lexic_anal():
     text = text_box.toPlainText()
     tokens = lexer(text)
-    print(tokens)
-    text = ''
+    formatted_text = ''
     for token in tokens:
-        text += "'" + token + "': " + tipoToken(token) + "\n"
-
-
-    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text)
+        token_type = tipoToken(token)
+        if token_type == 'palabra reservada':
+            formatted_text += f'<span style="color: blue;">{token}</span> - Palabra Reservada<br>'
+        elif token_type == 'comentario':
+            formatted_text += f'<span style="color: green;">{token}</span> - Comentario<br>'
+        elif token_type == 'identificador':
+            formatted_text += f'<span style="color: black;">{token}</span> - Identificador<br>'
+        elif token_type == 'simbolo aritmetico':
+            formatted_text += f'<span style="color: yellow;">{token}</span> - Símbolo Aritmético<br>'
+        elif token_type == 'numero real':
+            formatted_text += f'<span style="color: red;">{token}</span> - Número Real<br>'
+        elif token_type == 'numero entero':
+            formatted_text += f'<span style="color: red;">{token}</span> - Número Entero<br>'
+        elif token_type == 'sibolo logico':
+            formatted_text += f'<span style="color: purple;">{token}</span> - Símbolo Lógico<br>'
+        elif token_type == 'simbolo parentesis':
+            formatted_text += f'<span style="color: magenta;">{token}</span> - Símbolo Parentesis<br>'
+        elif token_type == 'simbolo corchete':
+            formatted_text += f'<span style="color: brown;">{token}</span> - Símbolo Corchete<br>'
+        elif token_type == 'simbolo llave':
+            formatted_text += f'<span style="color: teal;">{token}</span> - Símbolo Llave<br>'
+        elif token_type == 'simbolo puntuacion':
+            formatted_text += f'<span style="color: pink;">{token}</span> - Símbolo Puntuación<br>'
+        elif token_type == 'operador logico':
+            formatted_text += f'<span style="color: navy;">{token}</span> - Operador Lógico<br>'
+        else:
+            formatted_text += token + ' - Desconocido<br>'
+        formatted_text += ' '  
+    
+    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(formatted_text)
 
 
 # Funcion para actualizar los numeros de linea
@@ -106,6 +131,7 @@ def update_line_numbers():
 # Funcion para manejar el evento de cambio de texto en el QTextEdit
 def text_changed():
     update_line_numbers()
+    
 
 # Funcion para manejar el evento de scroll
 def scroll_event():
