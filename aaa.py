@@ -9,7 +9,7 @@ import os
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
 
-from analLexico import lexer
+from analLexico import lexer, tipoToken
 
 
 file_path_save = os.path.join(os.getcwd(), 'default.cps')
@@ -89,7 +89,8 @@ def lexic_anal():
     print(tokens)
     text = ''
     for token in tokens:
-        text += "'" + token + "'\n"
+        text += "'" + token + "': " + tipoToken(token) + "\n"
+
 
     tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text)
 
