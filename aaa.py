@@ -3,8 +3,8 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QIcon, QWheelEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5 import QtMultimedia, QtCore
-
-import os
+from PyQt5 import QtGui
+import os, re
 
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
@@ -17,6 +17,94 @@ file_path_save = os.path.join(os.getcwd(), 'default.cps')
 labels = {'lexico', 'semantico', 'sintactico', 'hash', 'codigo'}
 colorsp1 = ['#995FA3','#93509F','#8D419B','#873297','#802392']
 colorsp2 = ['#CE7B91','#B47182']
+
+# Function to apply syntax highlighting
+def apply_syntax_highlighting():
+    cursor = text_box.textCursor()
+    cursor.movePosition(QtGui.QTextCursor.Start)
+
+    # Get the current text
+    text = text_box.toPlainText()
+
+    # Clear previous formatting
+    fmt = QtGui.QTextCharFormat()
+    fmt.setForeground(QtGui.QColor("#FFFFFF"))  # Default text color
+    cursor.select(QtGui.QTextCursor.Document)
+    cursor.mergeCharFormat(fmt)
+
+    # Apply syntax highlighting based on lexico_anal() tokens
+    tokens = lexer(text)
+    for token in tokens:
+        token_type = tipoToken(token)
+        fmt.setForeground(QtGui.QColor(get_color(token_type)))  # Set color for token type
+        matches = re.finditer(re.escape(token), text)
+        for match in matches:
+            start, end = match.span()
+            cursor.setPosition(start)
+            cursor.movePosition(QtGui.QTextCursor.Right, QtGui.QTextCursor.KeepAnchor, end - start)
+            cursor.mergeCharFormat(fmt)
+
+
+def lexic_anal():
+    text = text_box.toPlainText()
+    tokens = lexer(text)
+    formatted_text = ''
+    for token in tokens:
+        token_type = tipoToken(token)
+        if token_type == 'palabra reservada':
+            formatted_text += f'<span style="color: blue;">{token}</span> - Palabra Reservada<br>'
+        elif token_type == 'comentario':
+            formatted_text += f'<span style="color: green;">{token}</span> - Comentario<br>'
+        elif token_type == 'identificador':
+            formatted_text += f'<span style="color: black;">{token}</span> - Identificador<br>'
+        elif token_type == 'simbolo aritmetico':
+            formatted_text += f'<span style="color: yellow;">{token}</span> - Símbolo Aritmético<br>'
+        elif token_type == 'numero real':
+            formatted_text += f'<span style="color: red;">{token}</span> - Número Real<br>'
+        elif token_type == 'numero entero':
+            formatted_text += f'<span style="color: red;">{token}</span> - Número Entero<br>'
+        elif token_type == 'sibolo logico':
+            formatted_text += f'<span style="color: purple;">{token}</span> - Símbolo Lógico<br>'
+        elif token_type == 'simbolo parentesis':
+            formatted_text += f'<span style="color: magenta;">{token}</span> - Símbolo Parentesis<br>'
+        elif token_type == 'simbolo corchete':
+            formatted_text += f'<span style="color: brown;">{token}</span> - Símbolo Corchete<br>'
+        elif token_type == 'simbolo llave':
+            formatted_text += f'<span style="color: brown;">{token}</span> - Símbolo Llave<br>'
+        elif token_type == 'simbolo puntuacion':
+            formatted_text += f'<span style="color: brown;">{token}</span> - Símbolo Puntuación<br>'
+        elif token_type == 'operador logico':
+            formatted_text += f'<span style="color: navy;">{token}</span> - Operador Lógico<br>'
+        else:
+            formatted_text += token + ' - Desconocido<br>'
+        formatted_text += ' '  
+    
+    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(formatted_text)
+    
+# Function to get color for a token type
+def get_color(token_type):
+    if token_type == 'palabra reservada':
+        return '#0000FF'  # Blue
+    elif token_type == 'identificador':
+        return '#000000'  # Black
+    elif token_type == 'comentario':
+        return '#00FF00'  # Green
+    elif token_type == 'simbolo aritmetico':
+        return '#FFFF00'  # Yellow
+    elif token_type in 'numero real':
+        return '#FF0000'  # Red
+    elif token_type in 'numero entero':
+        return '#FF0000'  # Gray
+    elif token_type == 'simbolo logico':
+        return '#800080'  # Purple
+    elif token_type in ('simbolo parentesis', 'simbolo corchete', 'simbolo llave'):
+        return '#A52A2A'  # Brown
+    elif token_type == 'simbolo puntuacion':
+        return '#FFC0CB'  # Pink
+    elif token_type == 'operador logico':
+        return '#000080'  # Navy
+    else:
+        return '#FFFFFF'  # Default text color
 
 class NoScrollTextEdit(QTextEdit):
     def wheelEvent(self, event: QWheelEvent):
@@ -83,17 +171,6 @@ def clear():
     file_path_save = os.path.join(os.getcwd(), 'default.cps')
     text_box.clear()
 
-def lexic_anal():
-    text = text_box.toPlainText()
-    tokens = lexer(text)
-    print(tokens)
-    text = ''
-    for token in tokens:
-        text += "'" + token + "': " + tipoToken(token) + "\n"
-
-
-    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text)
-
 
 # Funcion para actualizar los numeros de linea
 def update_line_numbers():
@@ -105,11 +182,31 @@ def update_line_numbers():
 
 # Funcion para manejar el evento de cambio de texto en el QTextEdit
 def text_changed():
+     # Desconectar temporalmente el evento textChanged
+    text_box.textChanged.disconnect()
+
+    # Realizar la actualización del texto
     update_line_numbers()
+    apply_syntax_highlighting()
+    # Volver a conectar el evento textChanged
+    text_box.textChanged.connect(text_changed)
+      # Obtener el texto actual del QTextEdit
+    #text = text_box.toPlainText()
+
+    # Aplicar el análisis léxico y obtener el texto formateado con colores
+    #lexic_anal()
+    
 
 # Funcion para manejar el evento de scroll
 def scroll_event():
+    # Disconnect the valueChanged signal temporarily to avoid recursion
+    text_box.verticalScrollBar().valueChanged.disconnect(scroll_event)
+
+    # Update line numbers
     update_line_numbers()
+
+    # Reconnect the valueChanged signal
+    text_box.verticalScrollBar().valueChanged.connect(scroll_event)
 
 # Creacion de una instancia de Application
 app = QApplication([])
