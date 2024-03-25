@@ -18,7 +18,6 @@ labels = {'lexico', 'semantico', 'sintactico', 'hash', 'codigo'}
 colorsp1 = ['#995FA3','#93509F','#8D419B','#873297','#802392']
 colorsp2 = ['#CE7B91','#B47182']
 
-# Function to apply syntax highlighting
 def apply_syntax_highlighting():
     cursor = text_box.textCursor()
     cursor.movePosition(QtGui.QTextCursor.Start)
@@ -32,17 +31,20 @@ def apply_syntax_highlighting():
     cursor.select(QtGui.QTextCursor.Document)
     cursor.mergeCharFormat(fmt)
 
-    # Apply syntax highlighting based on lexico_anal() tokens
-    tokens = lexer(text)
-    for token in tokens:
+    # Apply syntax highlighting based on lexer tokens
+    unique_tokens = set(lexer(text))  # Get unique tokens
+    for token in unique_tokens:
         token_type = tipoToken(token)
         fmt.setForeground(QtGui.QColor(get_color(token_type)))  # Set color for token type
-        matches = re.finditer(re.escape(token), text)
+        token_regex = re.escape(token)
+        matches = re.finditer(token_regex, text)
         for match in matches:
             start, end = match.span()
             cursor.setPosition(start)
             cursor.movePosition(QtGui.QTextCursor.Right, QtGui.QTextCursor.KeepAnchor, end - start)
             cursor.mergeCharFormat(fmt)
+
+
 
 
 def lexic_anal():
@@ -68,11 +70,11 @@ def lexic_anal():
         elif token_type == 'simbolo parentesis':
             formatted_text += f'<span style="color: magenta;">{token}</span> - Símbolo Parentesis<br>'
         elif token_type == 'simbolo corchete':
-            formatted_text += f'<span style="color: brown;">{token}</span> - Símbolo Corchete<br>'
+            formatted_text += f'<span style="color: orange;">{token}</span> - Símbolo Corchete<br>'
         elif token_type == 'simbolo llave':
             formatted_text += f'<span style="color: brown;">{token}</span> - Símbolo Llave<br>'
         elif token_type == 'simbolo puntuacion':
-            formatted_text += f'<span style="color: brown;">{token}</span> - Símbolo Puntuación<br>'
+            formatted_text += f'<span style="color: pink;">{token}</span> - Símbolo Puntuación<br>'
         elif token_type == 'operador logico':
             formatted_text += f'<span style="color: navy;">{token}</span> - Operador Lógico<br>'
         else:
@@ -95,9 +97,13 @@ def get_color(token_type):
         return '#FF0000'  # Red
     elif token_type in 'numero entero':
         return '#FF0000'  # Gray
-    elif token_type == 'simbolo logico':
+    elif token_type == 'sibolo logico':
         return '#800080'  # Purple
-    elif token_type in ('simbolo parentesis', 'simbolo corchete', 'simbolo llave'):
+    elif token_type in ('simbolo parentesis'):
+        return '#ff00ff'  # Magenta
+    elif token_type in ('simbolo corchete') :
+        return '#ffa500'  # orange
+    elif token_type in ('simbolo llave') :
         return '#A52A2A'  # Brown
     elif token_type == 'simbolo puntuacion':
         return '#FFC0CB'  # Pink
@@ -199,14 +205,11 @@ def text_changed():
 
 # Funcion para manejar el evento de scroll
 def scroll_event():
-    # Disconnect the valueChanged signal temporarily to avoid recursion
-    text_box.verticalScrollBar().valueChanged.disconnect(scroll_event)
 
     # Update line numbers
     update_line_numbers()
 
-    # Reconnect the valueChanged signal
-    text_box.verticalScrollBar().valueChanged.connect(scroll_event)
+
 
 # Creacion de una instancia de Application
 app = QApplication([])

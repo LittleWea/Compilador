@@ -5,6 +5,7 @@ def lexer(expresion):
     # Definir patrones para los diferentes tokens
     patron_palabra = r'\b[a-zA-Z_][a-zA-Z0-9_]*\b'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
+    patron_com = r'#[^\n]*'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%]'
     patron_numero_real = r'[-+]?\d+\.\d+'
     patron_numero_entero = r'[-+]?\d+'
@@ -25,6 +26,7 @@ def lexer(expresion):
         patron_simbolo_aritmetico,
         patron_numero_real,
         patron_numero_entero,
+        patron_com,
         patron_simbolo_logico,
         patron_parentesis,
         patron_corchetes,
@@ -48,6 +50,7 @@ def lexer(expresion):
 
 def tipoToken( expresion):
     patron_palabra = r'\b[a-zA-Z_][a-zA-Z0-9_]*\b'
+    patron_com = r'#[^\n]*'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%]'
     patron_numero_real = r'[-+]?\d+\.\d+'
@@ -60,9 +63,11 @@ def tipoToken( expresion):
     patron_operadores_logicos = r'\|\||&&'
     if( (expresion == 'if') | (expresion == 'othewise') | (expresion == 'do') | (expresion == 'while') | 
        (expresion == 'switch') | (expresion == 'case') | (expresion == 'integer') | (expresion == 'double') | 
-       (expresion == 'main') | (expresion == 'return')):
+       (expresion == 'main') | (expresion == 'return')|(expresion == 'else')):
         return 'palabra reservada'
     elif(re.fullmatch(patron_cadena_entre_dos_simbolos, expresion)):
+        return 'comentario'
+    elif(re.fullmatch(patron_com, expresion)):
         return 'comentario'
     elif(re.fullmatch(patron_palabra, expresion)):
         return 'identificador'
