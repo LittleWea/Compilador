@@ -302,6 +302,8 @@ Font.setFamily("Cascadia Code SemiLight")
 Font.setPointSize(11)
 text_box.setFont(Font)
 text_box.setPlaceholderText("Enter text here...")
+text_box.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)  # Always show horizontal scroll bar
+text_box.setLineWrapMode(QTextEdit.NoWrap)
 text_box.verticalScrollBar().valueChanged.connect(scroll_event)
 text_box.textChanged.connect(text_changed)
 

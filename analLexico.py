@@ -3,7 +3,7 @@ import re
 def lexer(expresion):
     tokens = []
     # Definir patrones para los diferentes tokens
-    patron_palabra = r'\b[a-zA-Z_][a-zA-Z0-9_]*\b'
+    patron_palabra = r'\b[a-zA-Z_@][a-zA-Z0-9_@]*\b'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_com = r'#[^\n]*'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%]'
@@ -13,8 +13,9 @@ def lexer(expresion):
     patron_parentesis = r'[\(\)]'
     patron_corchetes = r'[\[\]]'
     patron_llaves = r'[\{\}]'
-    patron_punto = r'[\.\,\;]'
+    patron_punto = r'[\,\;]'
     patron_operadores_logicos = r'\|\||&&'
+    patron_objeto = r'\b[a-zA-Z_@]\.[a-zA-Z0-9_@]*\b'
 
     # Patrón general para ignorar saltos de línea y espacios
     patron_ignorar = r'\s+'
@@ -33,6 +34,7 @@ def lexer(expresion):
         patron_llaves,
         patron_punto,
         patron_operadores_logicos,
+        patron_objeto,
         patron_ignorar
     ])
 
@@ -49,7 +51,7 @@ def lexer(expresion):
     return tokens
 
 def tipoToken( expresion):
-    patron_palabra = r'\b[a-zA-Z_][a-zA-Z0-9_]*\b'
+    patron_palabra = r'\b[a-zA-Z_@][a-zA-Z0-9_@]*\b'
     patron_com = r'#[^\n]*'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%]'
@@ -59,7 +61,8 @@ def tipoToken( expresion):
     patron_parentesis = r'[\(\)]'
     patron_corchetes = r'[\[\]]'
     patron_llaves = r'[\{\}]'
-    patron_punto = r'[\.\,\;]'
+    patron_objeto = r'\b[a-zA-Z_@]\.[a-zA-Z0-9_@]*\b'
+    patron_punto = r'[\,\;]'
     patron_operadores_logicos = r'\|\||&&'
     if( (expresion == 'if') | (expresion == 'othewise') | (expresion == 'do') | (expresion == 'while') | 
        (expresion == 'switch') | (expresion == 'case') | (expresion == 'integer') | (expresion == 'double') | 
@@ -89,3 +92,5 @@ def tipoToken( expresion):
         return 'simbolo puntuacion'
     elif(re.fullmatch(patron_operadores_logicos, expresion)):
         return 'operador logico'
+    elif(re.fullmatch(patron_objeto, expresion)):
+        return 'objeto con funcion'
