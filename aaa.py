@@ -258,7 +258,10 @@ tab_widget_1.setTabText(4, "Codigo Intermedio")
 for i in range(2):
     # Crear un Label para cada uno de los Tabs
     label = QLabel(f'Initial Text for Tab {i+1}')
-    tab_widget_2.addTab(QWidget(), f'Tab {i+1}')
+    scroll_area = QScrollArea()
+    scroll_area.setWidgetResizable(True)
+    scroll_area.setWidget(label)
+    tab_widget_2.addTab(scroll_area, f'Tab {i+1}')
     tab_widget_2.widget(i).layout = QVBoxLayout()
     tab_widget_2.widget(i).layout.addWidget(label)
     tab_widget_2.widget(i).setLayout(tab_widget_2.widget(i).layout)
