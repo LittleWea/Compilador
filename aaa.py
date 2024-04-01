@@ -44,13 +44,11 @@ def apply_syntax_highlighting():
             cursor.movePosition(QtGui.QTextCursor.Right, QtGui.QTextCursor.KeepAnchor, end - start)
             cursor.mergeCharFormat(fmt)
 
-
-
-
 def lexic_anal():
     text = text_box.toPlainText()
     tokens = lexer(text)
     formatted_text = ''
+    error_text = ''
     for token in tokens:
         token_type = tipoToken(token)
         if token_type == 'palabra reservada':
@@ -78,10 +76,11 @@ def lexic_anal():
         elif token_type == 'operador logico':
             formatted_text += f'<span style="color: navy;">{token}</span> - Operador Lógico<br>'
         else:
-            formatted_text += token + ' - Desconocido<br>'
+            error_text += f'{token} - Desconocido\n'
         formatted_text += ' '  
     
     tab_widget_1.widget(0).layout.itemAt(0).widget().setText(formatted_text)
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(error_text)
     
 # Function to get color for a token type
 def get_color(token_type):
