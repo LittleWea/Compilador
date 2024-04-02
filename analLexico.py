@@ -111,5 +111,7 @@ def tipoToken(expresion):
         return 'simbolo llave'
     elif(re.fullmatch(patron_punto, expresion)):
         return 'simbolo puntuacion'
+    elif (re.fullmatch(patron_operadores_logicos, expresion)):
+        return 'operador logico'
     elif (re.fullmatch(patron_general, expresion) == None):
         return 'error'
