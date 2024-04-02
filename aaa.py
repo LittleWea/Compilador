@@ -2,9 +2,9 @@ from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBo
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QIcon, QWheelEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
-from PyQt5 import QtMultimedia, QtCore
+from PyQt5 import QtMultimedia, QtCore, QtGui
 
-import os
+import os, re
 
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
@@ -46,7 +46,61 @@ def open_file():
             text = file.read()
             text_box.setPlainText(text)
             update_line_numbers()
+            
+def apply_syntax_highlighting():
+    cursor = text_box.textCursor()
+    cursor.movePosition(QtGui.QTextCursor.Start)
 
+    # Obtener el texto actual
+    texto = text_box.toPlainText()
+
+    # Limpiar el formato previo
+    formato_default = QtGui.QTextCharFormat()
+    formato_default.setForeground(QtGui.QColor("#FFFFFF"))  # Color de texto predeterminado
+    cursor.select(QtGui.QTextCursor.Document)
+    cursor.mergeCharFormat(formato_default)
+
+    # Aplicar resaltado de sintaxis
+    tokens = lexer(texto)
+    for token, linea, columna in tokens:
+        formato = QtGui.QTextCharFormat()
+        tipo = tipoToken(token)
+        color = get_color(tipo)
+        formato.setForeground(QtGui.QColor(color))
+        cursor.setPosition(text_box.document().findBlockByLineNumber(linea - 1).position() + columna - 1)
+        cursor.movePosition(QtGui.QTextCursor.Right, QtGui.QTextCursor.KeepAnchor, len(token))
+        cursor.mergeCharFormat(formato)
+
+
+# Function to get color for a token type
+def get_color(token_type):
+    if token_type is None:
+        return '#FFFFFF'  # Default text color
+    elif token_type == 'palabra reservada':
+        return '#0000FF'  # Blue
+    elif token_type == 'identificador':
+        return '#000000'  # Black
+    elif token_type == 'comentario':
+        return '#00FF00'  # Green
+    elif token_type == 'simbolo aritmetico':
+        return '#FFFF00'  # Yellow
+    elif token_type in 'numero real':
+        return '#FF0000'  # Red
+    elif token_type in 'numero entero':
+        return '#808080'  # Gray
+    elif token_type == 'sibolo logico':
+        return '#800080'  # Purple
+    elif token_type in ('simbolo parentesis'):
+        return '#FF00FF'  # Magenta
+    elif token_type in ('simbolo corchete'):
+        return '#FFA500'  # Orange
+    elif token_type in ('simbolo llave'):
+        return '#A52A2A'  # Brown
+    elif token_type == 'simbolo puntuacion':
+        return '#FFC0CB'  # Pink
+    elif token_type == 'operador logico':
+        return '#000080'  # Navy
+    
 # Funcion para actualizar la posicion del cursor
 def update_cursor_position():
     cursor = text_box.textCursor()
@@ -82,11 +136,26 @@ def clear():
     global file_path_save
     file_path_save = os.path.join(os.getcwd(), 'default.cps')
     text_box.clear()
+    
+#Función para guardar los tokens en un archivo llamado tokens.cps
+def save_tokens(tokens):
+    with open('tokens.cps', 'w') as file:
+        for token in tokens:
+            file.write(f"'{token[0]}': {tipoToken(token[0])}\n")
+
+# Función para guardar los errores en un archivo llamado errores.cps
+def save_errors(tokens):
+    with open('errores.cps', 'w') as file:
+        for token in tokens:
+            if tipoToken(token[0]) == 'error':
+                file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
+
 
 def lexic_anal():
     text = text_box.toPlainText()
     tokens = lexer(text)
-    
+    save_tokens(tokens)
+    save_errors(tokens)
     text = ''
     textError = ''
     for token in tokens:
@@ -111,7 +180,13 @@ def update_line_numbers():
 
 # Funcion para manejar el evento de cambio de texto en el QTextEdit
 def text_changed():
+    text_box.textChanged.disconnect()
+
+    # Realizar la actualización del texto
     update_line_numbers()
+    apply_syntax_highlighting()
+    # Volver a conectar el evento textChanged
+    text_box.textChanged.connect(text_changed)
 
 # Funcion para manejar el evento de scroll
 def scroll_event():
@@ -211,6 +286,7 @@ text_box.setFont(Font)
 text_box.setPlaceholderText("Enter text here...")
 text_box.verticalScrollBar().valueChanged.connect(scroll_event)
 text_box.textChanged.connect(text_changed)
+
 text_box.setLineWrapMode(QTextEdit.NoWrap)
 
 # Agregar el editor de texto
@@ -258,10 +334,7 @@ tab_widget_1.setTabText(4, "Codigo Intermedio")
 for i in range(2):
     # Crear un Label para cada uno de los Tabs
     label = QLabel(f'Initial Text for Tab {i+1}')
-    scroll_area = QScrollArea()
-    scroll_area.setWidgetResizable(True)
-    scroll_area.setWidget(label)
-    tab_widget_2.addTab(scroll_area, f'Tab {i+1}')
+    tab_widget_2.addTab(QWidget(), f'Tab {i+1}')
     tab_widget_2.widget(i).layout = QVBoxLayout()
     tab_widget_2.widget(i).layout.addWidget(label)
     tab_widget_2.widget(i).setLayout(tab_widget_2.widget(i).layout)
