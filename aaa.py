@@ -134,11 +134,26 @@ def clear():
     global file_path_save
     file_path_save = os.path.join(os.getcwd(), 'default.cps')
     text_box.clear()
+    
+#Función para guardar los tokens en un archivo llamado tokens.cps
+def save_tokens(tokens):
+    with open('tokens.cps', 'w') as file:
+        for token in tokens:
+            file.write(f"'{token[0]}': {tipoToken(token[0])}\n")
+
+# Función para guardar los errores en un archivo llamado errores.cps
+def save_errors(tokens):
+    with open('errores.cps', 'w') as file:
+        for token in tokens:
+            if tipoToken(token[0]) == 'error':
+                file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
+
 
 def lexic_anal():
     text = text_box.toPlainText()
     tokens = lexer(text)
-    
+    save_tokens(tokens)
+    save_errors(tokens)
     text = ''
     textError = ''
     for token in tokens:
