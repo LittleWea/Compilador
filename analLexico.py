@@ -3,7 +3,7 @@ import re
 def lexer(expresion):
     tokens = []
     # Definir patrones para los diferentes tokens
-    patron_palabra = r'\b[a-zñA-ZÑ_@][a-zñA-ZÑ0-9_@]*\b'
+    patron_palabra = r'\b[a-zñA-ZÑ_][a-zñA-ZÑ0-9_]*\b'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_comentario = r'#[^\n]*'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%]'
@@ -56,7 +56,7 @@ def lexer(expresion):
     return tokens
 
 def tipoToken(expresion):
-    patron_palabra = r'\b[a-zñA-ZÑ_@][a-zñA-ZÑ0-9_@]*\b'
+    patron_palabra = r'\b[a-zñA-ZÑ_][a-zñA-ZÑ0-9_]*\b'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_com = r'#[^\n]*'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%\=]'
