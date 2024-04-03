@@ -88,7 +88,7 @@ def get_color(token_type):
         return '#FF0000'  # Red
     elif token_type in 'numero entero':
         return '#808080'  # Gray
-    elif token_type == 'sibolo logico':
+    elif token_type == 'simbolo logico':
         return '#800080'  # Purple
     elif token_type in ('simbolo parentesis'):
         return '#FF00FF'  # Magenta
