@@ -74,8 +74,8 @@ def apply_syntax_highlighting():
 
 # Function to get color for a token type
 def get_color(token_type):
-    if token_type is None:
-        return '#FFFFFF'  # Default text color
+    if token_type == 'error':
+        return '##00FF0D'  # Default text color
     elif token_type == 'palabra reservada':
         return '#0000FF'  # Blue
     elif token_type == 'identificador':
@@ -87,7 +87,7 @@ def get_color(token_type):
     elif token_type in 'numero real':
         return '#FF0000'  # Red
     elif token_type in 'numero entero':
-        return '#808080'  # Gray
+        return '#00DDFF'  # Gray
     elif token_type == 'sibolo logico':
         return '#800080'  # Purple
     elif token_type in ('simbolo parentesis'):
