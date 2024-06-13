@@ -1,15 +1,16 @@
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog, QScrollArea
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QIcon, QWheelEvent
+from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QWheelEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5 import QtMultimedia, QtCore, QtGui
-
+from anytree import RenderTree, Node
 import os, re
-
+import json
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
+from analLexico import lexer, tipoToken, Token
 
-from analLexico import lexer, tipoToken
+from analsint import analisis_sintactico, SyntaxError
 
 
 file_path_save = os.path.join(os.getcwd(), 'default.cps')
@@ -34,6 +35,28 @@ def handle_selection_change(index):
     else:
         print("Selected item:", selected_item)
     combo_box.setCurrentIndex(0)
+# aaa.py
+
+# Función para realizar el análisis sintáctico
+# Modifica la función para manejar el análisis sintáctico
+# Modifica la función para manejar el análisis sintáctico
+def parse(tokens):
+    try:
+        # Convertir tokens a una lista de strings
+        token_strings = [token[0] for token in tokens]
+        if analisis_sintactico(token_strings):
+            return "Análisis sintáctico exitoso"
+        else:
+            return "Error en el análisis sintáctico"
+    except SyntaxError as e:
+        # Extraer la fila y columna del token donde ocurrió el error
+        fila = tokens[0][1]
+        columna = tokens[0][2]
+        error =  f"Error sintáctico en fila {fila}, columna {columna}: {e}"
+        return error
+
+
+    
 
 # Funcion para abrir archivos y escribir sobre el TextEdit
 def open_file():
@@ -151,23 +174,29 @@ def save_errors(tokens):
                 file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
 
 
+# Función principal para realizar el análisis léxico y sintáctico
 def lexic_anal():
     text = text_box.toPlainText()
     tokens = lexer(text)
     save_tokens(tokens)
     save_errors(tokens)
-    text = ''
-    textError = ''
+    text_tokens = ''
+    text_errors = ''
+    
+
     for token in tokens:
-        aux = tipoToken( token[0] )
+        aux = tipoToken(token[0])
         if aux != 'error':
-            text += "'" + token[0] + ': ' + str(aux) + "\n"
+            text_tokens += "'" + token[0] + ': ' + str(aux) + "\n"
         else:
-            textError += "'" + token[0] + "': " + str(aux) + " en columna: " + str(token[2]) + ", fila: " + str(token[1]) + "\n"
+            text_errors += "'" + token[0] + "': " + str(aux) + " en columna: " + str(token[2]) + ", fila: " + str(token[1]) + "\n"
+    # Actualizar los textos en las pestañas correspondientes
+    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text_tokens)
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(text_errors)
 
+    result = parse(tokens)
+    tab_widget_1.widget(2).layout.itemAt(0).widget().setText(result)  
 
-    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text)
-    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(textError)
 
 
 # Funcion para actualizar los numeros de linea
@@ -250,6 +279,7 @@ lexic_button.setIcon(QIcon('lex_icon.jpg'))  # Set the icon
 lexic_button.setIconSize(close_button.sizeHint())
 lexic_button.setToolTip('Lexic')
 lexic_button.clicked.connect(lexic_anal)
+#lexic_button.clicked.connect(perform_syntax_analysis)
 
 # Agregar el boton anterior en el layout de menu
 menu_layout.addWidget(lexic_button)

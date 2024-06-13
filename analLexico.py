@@ -1,8 +1,17 @@
 import re
 
+class Token:
+    def __init__(self, tipo, valor, fila, columna):
+        self.tipo = tipo
+        self.valor = valor
+        self.fila = fila
+        self.columna = columna
+
+    def __str__(self):
+        return f"Token({self.tipo}, {self.valor}, {self.fila}, {self.columna})"
+
 def lexer(expresion):
     tokens = []
-    # Definir patrones para los diferentes tokens
     patron_palabra = r'\b[a-zñA-ZÑ_@][a-zñA-ZÑ0-9_@]*\b'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_comentario = r'#[^\n]*'
@@ -15,7 +24,7 @@ def lexer(expresion):
     patron_corchetes = r'[\[\]]'
     patron_llaves = r'[\{\}]'
     patron_punto = r'[\,\;]'
-    patron_operadores_logicos = r'\|\||&&'
+    patron_operadores_logicos = r'\b(AND|OR)\b'
     patron_ignorar = r'[\n\s]+'
 
     patron_error = r'.'
@@ -68,7 +77,8 @@ def tipoToken(expresion):
     patron_corchetes = r'[\[\]]'
     patron_llaves = r'[\{\}]'
     patron_punto = r'[\,\;]'
-    patron_operadores_logicos = r'\|\||&&'
+    patron_operadores_logicos = r'\b(AND|OR)\b'
+
 
     patron_general = '|'.join([
             patron_cadena_entre_dos_simbolos,
@@ -115,3 +125,4 @@ def tipoToken(expresion):
         return 'operador logico'
     elif (re.fullmatch(patron_general, expresion) == None):
         return 'error'
+    
