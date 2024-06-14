@@ -10,7 +10,7 @@ from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
 from analLexico import lexer, tipoToken, Token
 
-from analsint import analisis_sintactico, SyntaxError
+#from analsint import analisis_sintactico, SyntaxError
 
 
 file_path_save = os.path.join(os.getcwd(), 'default.cps')
@@ -40,7 +40,7 @@ def handle_selection_change(index):
 # Función para realizar el análisis sintáctico
 # Modifica la función para manejar el análisis sintáctico
 # Modifica la función para manejar el análisis sintáctico
-def parse(tokens):
+'''def parse(tokens):
     try:
         # Convertir tokens a una lista de strings
         token_strings = [token[0] for token in tokens]
@@ -57,7 +57,7 @@ def parse(tokens):
 
 
     
-
+'''
 # Funcion para abrir archivos y escribir sobre el TextEdit
 def open_file():
     file_path, _ = QFileDialog.getOpenFileName(window, 'Abrir Archivo', '', 'CalebPerezScript(*.cps)')
@@ -194,8 +194,8 @@ def lexic_anal():
     tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text_tokens)
     tab_widget_2.widget(0).layout.itemAt(0).widget().setText(text_errors)
 
-    result = parse(tokens)
-    tab_widget_1.widget(2).layout.itemAt(0).widget().setText(result)  
+#    result = parse(tokens)
+ #   tab_widget_1.widget(2).layout.itemAt(0).widget().setText(result)  
 
 
 
