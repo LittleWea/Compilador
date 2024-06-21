@@ -16,6 +16,7 @@ def lexer(expresion):
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_comentario = r'#[^\n]*'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%]'
+    patron_simbolo_aritmetico2 = r'\+\+|--'
     patron_numero_real = r'[-+]?\d+\.\d+'
     patron_numero_entero = r'[-+]?\d+'
     patron_simbolo_logico = r'[<>]=?'
@@ -26,7 +27,6 @@ def lexer(expresion):
     patron_punto = r'[\,\;]'
     patron_operadores_logicos = r'\|\||&&'
     patron_ignorar = r'[\n\s]+'
-
     patron_error = r'.'
 
     fila = 1
@@ -36,6 +36,7 @@ def lexer(expresion):
         patron_cadena_entre_dos_simbolos,
         patron_comentario,
         patron_palabra,
+        patron_simbolo_aritmetico2,
         patron_simbolo_aritmetico,
         patron_numero_real,
         patron_numero_entero,
@@ -65,10 +66,11 @@ def lexer(expresion):
     return tokens
 
 def tipoToken(expresion):
-    patron_palabra = r'\b[a-zñA-ZÑ_@][a-zñA-ZÑ0-9_@]*\b'
+    patron_palabra = r'\b[a-zñA-ZÑ_][a-zñA-ZÑ0-9_]*\b'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_com = r'#[^\n]*'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%\=]'
+    patron_simbolo_aritmetico2 = r'\+\+|--'
     patron_numero_real = r'[-+]?\d+\.\d+'
     patron_numero_entero = r'[-+]?\d+'
     patron_simbolo_logico = r'[<>]=?'
@@ -85,6 +87,7 @@ def tipoToken(expresion):
             patron_com,
             patron_palabra,
             patron_simbolo_aritmetico,
+            patron_simbolo_aritmetico2,
             patron_simbolo_logico2,
             patron_numero_real,
             patron_numero_entero,
@@ -105,13 +108,13 @@ def tipoToken(expresion):
         return 'comentario'
     elif(re.fullmatch(patron_palabra, expresion)):
         return 'identificador'
-    elif(re.fullmatch(patron_simbolo_aritmetico, expresion)):
+    elif(re.fullmatch(patron_simbolo_aritmetico, expresion ) or re.fullmatch(patron_simbolo_aritmetico2, expresion)):
         return 'simbolo aritmetico'
     elif(re.fullmatch(patron_numero_real, expresion)):
         return 'numero real'
     elif(re.fullmatch(patron_numero_entero, expresion)):
         return 'numero entero'
-    elif(re.fullmatch(patron_simbolo_logico, expresion) or re.fullmatch(patron_simbolo_logico2, expresion)):
+    elif(re.fullmatch(patron_simbolo_logico, expresion) or re.fullmatch(patron_simbolo_logico2, expresion) ):
         return 'simbolo logico'
     elif(re.fullmatch(patron_parentesis, expresion)):
         return 'simbolo parentesis'
