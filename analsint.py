@@ -1,10 +1,5 @@
-import ply.yacc as yacc
+from anytree import Node, RenderTree
 
-import ply.lex as lex
-from anytree import RenderTree, Node
-#from anytree import Node, RenderTree
-
-# List of all tokens
 tokens = (
     'MAIN', 'INTEGER', 'DOUBLE', 'BOOLEAN', 'IDENTIFIER', 'NUMBER', 'REALNUMBER', 'BOOL', 'SUMDOUBLE', 'MINUSDOUBLE', 'SUM', 'MINUS', 'TIMES', 'DIVISION', 'MODULE', 'POW',
     'ASSIGN', 'PARLEFT','PARRIGHT', 'SQRLEFT', 'SQRRIGHT', 'KEYLEFT', 'KEYRIGHT', 'COMMA', 'DOTCOMMA', 'DOUBLEDOT', 'SINGLECOMMENT', 'MULTIPLECOMMENT', 
@@ -144,69 +139,52 @@ def t_newline(t):
 def t_error(t):
   t.lexer.skip(1)
 
-# Build the lexer
-lexec = lex.lex()
-
-ind = 0
 # Definición de las clases para representar los nodos del AST
-class Node:
-    def __init__(self, type, children="", value="", salto="", indent = " "):
-        self.type = type
-        self.children = children if children else []
-        self.value = value
-        self.indent = " "
-        self.salto = '\n'
-        self.indent = '\t'
 
-    def __repr__(self):
-        return f"{self.type} {self.children}{self.value})"
-
-# Definimos el token 'program' que se utilizará como raíz del AST
 def p_program(p):
     '''program : main'''
-    p[0] = Node('program', [p[1]])
+    p[0] = Node('program', children=[p[1]])
 
-# Definimos la regla para la producción 'main'
 def p_main(p):
     '''main : MAIN KEYLEFT declarations KEYRIGHT'''
-    p[0] = Node('main', [p[3]])
+    p[0] = Node('main', children=[p[3]])
 
 def p_declarations(p):
     '''declarations : declarations declaration
                     | declaration'''
     if len(p) == 3:
-        p[0] = Node('declarations', [p[1], p[2]])
+        p[0] = Node('declarations', children=[p[1], p[2]])
     else:
-        p[0] = Node('declarations', [p[1]])
+        p[0] = Node('declarations', children=[p[1]])
 
 def p_declaration(p):
     '''declaration : declaration_variable
                    | list_statements'''
-    p[0] = Node('declaration', [p[1]])
+    p[0] = Node('declaration', children=[p[1]])
 
 def p_declaration_variable(p):
     '''declaration_variable : type variable DOTCOMMA'''
-    p[0] = Node('declaration_variable', [p[1], p[2]])
+    p[0] = Node('declaration_variable', children=[p[1], p[2]])
 
 def p_variable(p):
     '''variable : variable COMMA IDENTIFIER
                 | IDENTIFIER'''
     if len(p) == 4:
-        p[0] = Node('variable', [p[1], p[3]])
+        p[0] = Node('variable', children=[p[1], Node(p[3], parent=p[1])])
     else:
-        p[0] = Node('variable', value=p[1])
+        p[0] = Node('variable', children=[Node(p[1])])
 
 def p_type(p):
     '''type : BOOLEAN
             | INTEGER
             | DOUBLE'''
-    p[0] = Node('type', value=p[1])
+    p[0] = Node('type', children=[Node(p[1])])
 
 def p_list_statements(p):
     '''list_statements : list_statements statement 
                        | empty'''
     if len(p) == 3:
-        p[0] = Node('list_statements', [p[1], p[2]])
+        p[0] = Node('list_statements', children=[p[1], p[2]])
     else:
         p[0] = Node('list_statements')
 
@@ -218,22 +196,21 @@ def p_statement(p):
                  | cout_statement
                  | assign_statement
                  | switch_statement'''
-    p[0] = Node('statement', [p[1]])
-
+    p[0] = Node('statement', children=[p[1]])
 
 def p_compound_statement(p):
    '''compound_statement : KEYLEFT list_statements KEYRIGHT'''
-   p[0] = Node('compound_statement', [p[1]])
+   p[0] = Node('compound_statement', children=[p[2]])
 
 def p_assign_statement(p):
     '''assign_statement : IDENTIFIER ASSIGN sent_expression'''
-    p[0] = Node('assign_statement', [p[1], p[3]])
+    p[0] = Node('assign_statement', children=[Node(p[1]), p[3]])
 
 def p_sent_expression(p):
     '''sent_expression : expression DOTCOMMA
                        | DOTCOMMA'''
     if len(p) == 3:
-        p[0] = Node('sent_expression', [p[1]])
+        p[0] = Node('sent_expression', children=[p[1]])
     else:
         p[0] = Node('sent_expression')
 
@@ -241,49 +218,49 @@ def p_select_statement(p):
     '''select_statement : IF PARLEFT expression PARRIGHT KEYLEFT list_statements KEYRIGHT
                         | IF PARLEFT expression PARRIGHT KEYLEFT list_statements KEYRIGHT OTHERWISE KEYLEFT list_statements KEYRIGHT'''
     if len(p) == 9:
-        p[0] = Node('select_statement', [p[3], p[6]])
+        p[0] = Node('select_statement', children=[p[3], p[6]])
     else:
-        p[0] = Node('select_statement', [p[3], p[6], p[10]])
+        p[0] = Node('select_statement', children=[p[3], p[6], p[10]])
 
 def p_iteration_statement(p):
     '''iteration_statement : WHILE PARLEFT expression PARRIGHT KEYLEFT list_statements KEYRIGHT
                            | DO KEYLEFT list_statements KEYRIGHT WHILE PARLEFT expression PARRIGHT'''
     if len(p) == 8:
-        p[0] = Node('iteration_statement', [p[3], p[6]])
+        p[0] = Node('iteration_statement', children=[p[3], p[6]])
     else:
-        p[0] = Node('iteration_statement', [p[6], p[8]])
+        p[0] = Node('iteration_statement', children=[p[6], p[8]])
 
 def p_switch_statement(p):
     '''switch_statement : SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT'''
-    p[0] = Node('switch_statement', [p[3], p[6]])
+    p[0] = Node('switch_statement', children=[p[3], p[6]])
 
 def p_case_list(p):
     '''case_list : case_list case_statement 
                  | case_statement'''
     if len(p) == 3:
-        p[0] = Node('case_list', [p[1], p[2]])
+        p[0] = Node('case_list', children=[p[1], p[2]])
     else:
-        p[0] = Node('case_list', [p[1]])
+        p[0] = Node('case_list', children=[p[1]])
 
 def p_case_statement(p):
     '''case_statement : CASE facts DOUBLEDOT list_statements BREAK DOTCOMMA'''
-    p[0] = Node('case_statement', [p[2], p[4]])
+    p[0] = Node('case_statement', children=[p[2], p[4]])
 
 def p_cin_statement(p):
     '''cin_statement : CIN IDENTIFIER DOTCOMMA'''
-    p[0] = Node('cin_statement', [p[2]])
+    p[0] = Node('cin_statement', children=[Node(p[2])])
 
 def p_cout_statement(p):
     '''cout_statement : COUT expression DOTCOMMA'''
-    p[0] = Node('cout_statement', [p[2]])
+    p[0] = Node('cout_statement', children=[p[2]])
 
 def p_expression(p):
     '''expression : simple_expression relation_operator simple_expression 
-                   | simple_expression'''
+                  | simple_expression'''
     if len(p) == 4:
-        p[0] = Node('expression', [p[1], p[2], p[3]])
+        p[0] = Node('expression', children=[p[1], p[2], p[3]])
     else:
-        p[0] = Node('expression', [p[1]])
+        p[0] = Node('expression', children=[p[1]])
 
 def p_relation_operator(p):
     '''relation_operator : EQUALS
@@ -294,78 +271,79 @@ def p_relation_operator(p):
                          | GREATEQUAL
                          | AND
                          | OR'''
-    p[0] = Node('relation_operator', value=p[1])
+    p[0] = Node('relation_operator', children=[Node(p[1])])
 
 def p_simple_expression(p):
     '''simple_expression : simple_expression sum_operator term
                          | term'''
     if len(p) == 4:
-        p[0] = Node('simple_expression', [p[1], p[2], p[3]])
+        p[0] = Node('simple_expression', children=[p[1], p[2], p[3]])
     else:
-        p[0] = Node('simple_expression', [p[1]])
+        p[0] = Node('simple_expression', children=[p[1]])
 
 def p_sum_operator(p):
     '''sum_operator : SUM
                     | MINUS'''
-    p[0] = Node('sum_operator', value=p[1])
+    p[0] = Node('sum_operator', children=[Node(p[1])])
 
 def p_term(p):
     '''term : term mult_operator factor 
             | factor'''
     if len(p) == 4:
-        p[0] = Node('term', [p[1], p[2], p[3]])
+        p[0] = Node('term', children=[p[1], p[2], p[3]])
     else:
-        p[0] = Node('term', [p[1]])
+        p[0] = Node('term', children=[p[1]])
 
 def p_mult_operator(p):
     '''mult_operator : TIMES
                      | DIVISION
                      | MODULE'''
-    p[0] = Node('mult_operator', value=p[1])
+    p[0] = Node('mult_operator', children=[Node(p[1])])
 
 def p_factor(p):
     '''factor : factor pot_operator double_fact
               | double_fact'''
     if len(p) == 4:
-        p[0] = Node('factor', [p[1], p[2], p[3]])
+        p[0] = Node('factor', children=[p[1], p[2], p[3]])
     else:
-        p[0] = Node('factor', [p[1]])
+        p[0] = Node('factor', children=[p[1]])
 
 def p_double_fact(p):
     '''double_fact : component double_op
                    | component'''
     if len(p) == 3:
-        p[0] = Node('double_fact', [p[1], p[2]])
+        p[0] = Node('double_fact', children=[p[1], p[2]])
     else:
-        p[0] = Node('double_fact', [p[1]])
+        p[0] = Node('double_fact', children=[p[1]])
 
 def p_pot_operator(p):
     '''pot_operator : POW'''
-    p[0] = Node('pot_operator', value=p[1])
+    p[0] = Node('pot_operator', children=[Node(p[1])])
 
 def p_double_op(p):
     '''double_op : SUMDOUBLE
                  | MINUSDOUBLE'''
-    p[0] = Node('double_op', value=p[1])
+    p[0] = Node('double_op', children=[Node(p[1])])
 
 def p_component(p):
     '''component : PARLEFT expression PARRIGHT
                  | IDENTIFIER
                  | facts'''
     if len(p) == 4:
-        p[0] = Node('component', [p[2]])
+        p[0] = Node('component', children=[p[2]])
     else:
-        p[0] = Node('component', value=p[1])
+        p[0] = Node('component', children=[Node(p[1])])
 
 def p_facts(p):
     '''facts : NUMBER
              | REALNUMBER
              | BOOL'''
-    p[0] = Node('facts', value=p[1])
+    p[0] = str(p[1])  # Directly assign the value to the node
+
 
 def p_empty(p):
     'empty : '
-    pass
+    p[0] = Node('empty')
 
 # Error rule for syntax errors
 def p_error(p):
@@ -378,37 +356,29 @@ def p_error(p):
         line = 'EOF'
     errors.append((line, error_msg))
 
-def generate_ast(p):
-    if isinstance(p, tuple):
-        node_type = p[0]  # Tipo del nodo es el primer elemento de la tupla
-        children = [generate_ast(child) for child in p[1:]]  # Generamos los hijos recursivamente
-        return Node(node_type, children)
-    else:
-        return Node(p)
+import ply.lex as lex
+import ply.yacc as yacc
 
-# Función para visualizar el AST
-def visualize_ast(node):
-    for pre, _, n in RenderTree(node):
-        f'{pre, n, n.type}'# Ahora mostramos el tipo de nodo también
+# Sample input to parse
+data = '''
+main {
+    integer x;
+    double y;
+    if (x < 10) {
+        y = 3.14;
+    } otherwise {
+        y = 2.71;
+    }
+}
+'''
 
-# Build the parser
+# Initialize lexer and parser
+lexer = lex.lex()
 parser = yacc.yacc()
 
-# Si ejecutas este archivo como script, puedes realizar pruebas directamente
+# Parse the data
+result = parser.parse(data, lexer=lexer)
 
-if __name__ == "__main__":
-    code = """
-    main {
-        double a, c;
-        if (a > c) {
-            a = a + c;
-        } otherwise {
-            a = b - c;
-        }
-    }
-    """
-    result = parser.parse(code)
-    #ast = generate_ast(result)
-    visualize_ast(result)
-    
-    print("Parsing completed successfully!") 
+# Render the tree
+for pre, fill, node in RenderTree(result):
+    print("%s%s" % (pre, node.name))
