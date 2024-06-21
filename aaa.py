@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog, QScrollArea
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog, QScrollArea, QTreeWidget, QTreeWidgetItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QWheelEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -12,8 +12,8 @@ from anytree.exporter import DotExporter
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
 from analLexico import lexer, tipoToken, Token
+from analsint import returnres
 
-from analsint import parser, ASTNode
 #from analsint import analisis_sintactico, SyntaxError
 
 
@@ -157,6 +157,22 @@ def save_errors(tokens):
                 file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
 
 
+def sint_anal():
+    text = text_box.toPlainText()
+    res = returnres(text)
+    tree_widget.clear()
+    build_tree(res, None)
+
+def build_tree(node, parent_item):
+    item = QTreeWidgetItem([node.name])
+    if parent_item is None:
+        tree_widget.addTopLevelItem(item)
+    else:
+        parent_item.addChild(item)
+
+    for child in node.children:
+        build_tree(child, item)
+
 # Función principal para realizar el análisis léxico y sintáctico
 def lexic_anal():
     text = text_box.toPlainText()
@@ -176,46 +192,6 @@ def lexic_anal():
     # Actualizar los textos en las pestañas correspondientes
     tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text_tokens)
     tab_widget_2.widget(0).layout.itemAt(0).widget().setText(text_errors)
-
-#    result = parse(tokens)
- #   tab_widget_1.widget(2).layout.itemAt(0).widget().setText(result)  
-# Función para generar el árbol de análisis sintáctico
-def generate_ast(result):
-    if isinstance(result, tuple):
-        node_type = result[0]  # Tipo del nodo es el primer elemento de la tupla
-        children = [generate_ast(child) for child in result[1:]]  # Generamos los hijos recursivamente
-        return ASTNode(node_type, children)
-    else:
-        return ASTNode(result)
-
-def visualize_ast(node, indent=''):
-    result = ""
-    result += f"{indent}├── {node.type}"  # Imprimir el tipo de nodo con la sangría actual
-    for child in node.children[:-1]:
-        result += visualize_ast(child.type, indent + "│   " )  # Llamar recursivamente a visualize_ast para los hijos
-    result += "\n"
-    if node.children:
-        result += visualize_ast(node.children[-1], indent + "|   ")  # El último hijo no necesita una barra vertical
-    return result
-
-
-
-def sint_anal():
-    text = text_box.toPlainText()
-    try:
-        result = parser.parse(text)
-        ast = generate_ast(result)
-        tree_text = visualize_ast(ast)
-        tab_widget_1.widget(2).layout.itemAt(0).widget().setFont(QFont("Courier", 10))  # Establecer una fuente de ancho fijo
-        tab_widget_1.widget(2).layout.itemAt(0).widget().setText(tree_text)
-        tab_widget_1.widget(2).layout.itemAt(0).widget().setWordWrap(True) 
-        result_text = "Análisis sintáctico completado sin errores."
-    except Exception as e:
-        result_text = f"Error en el análisis sintáctico: {str(e)}"
-        tab_widget_1.widget(2).layout.itemAt(0).widget().setText(result_text)
-    tab_widget_2.widget(1).layout.itemAt(0).widget().setText(result_text)
-
-
 
 # Funcion para actualizar los numeros de linea
 def update_line_numbers():
@@ -301,6 +277,7 @@ lexic_button.clicked.connect(lexic_anal)
 sint_button = QPushButton('', window)
 sint_button.setIcon(QIcon('lex_icon.jpg'))  # Set the icon
 sint_button.setIconSize(close_button.sizeHint())
+
 sint_button.clicked.connect(sint_anal)
 
 # Agregar el boton anterior en el layout de menu
@@ -411,6 +388,13 @@ left_layout.addWidget(cursor_position_label)
 
 # Conectar el evento cursorPositionChanged al QTextEdit
 text_box.cursorPositionChanged.connect(update_cursor_position)
+
+
+# Añadir QTreeWidget al tab de Sintactico
+tree_widget = QTreeWidget()
+tree_widget.setColumnCount(1)
+tree_widget.setHeaderLabels(['AST'])
+tab_widget_1.widget(2).layout.addWidget(tree_widget)
 
 # Mostrar la ventana principal
 window.show()

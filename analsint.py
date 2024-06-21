@@ -1,3 +1,4 @@
+from PyQt5.QtWidgets import QApplication, QMainWindow, QTreeWidget, QTreeWidgetItem, QVBoxLayout, QWidget
 from anytree import Node, RenderTree
 
 tokens = (
@@ -306,7 +307,7 @@ def p_factor(p):
     if len(p) == 4:
         p[0] = Node('factor', children=[p[1], p[2], p[3]])
     else:
-        p[0] = Node('factor', children=[p[1]])
+        p[0] = p[1]
 
 def p_double_fact(p):
     '''double_fact : component double_op
@@ -314,7 +315,7 @@ def p_double_fact(p):
     if len(p) == 3:
         p[0] = Node('double_fact', children=[p[1], p[2]])
     else:
-        p[0] = Node('double_fact', children=[p[1]])
+        p[0] = p[1]
 
 def p_pot_operator(p):
     '''pot_operator : POW'''
@@ -323,16 +324,16 @@ def p_pot_operator(p):
 def p_double_op(p):
     '''double_op : SUMDOUBLE
                  | MINUSDOUBLE'''
-    p[0] = Node('double_op', children=[Node(p[1])])
+    p[0] = Node(p[1])
 
 def p_component(p):
     '''component : PARLEFT expression PARRIGHT
                  | IDENTIFIER
                  | facts'''
     if len(p) == 4:
-        p[0] = Node('component', children=[p[2]])
+        p[0] = p[2]
     else:
-        p[0] = Node('component', children=[Node(p[1])])
+        p[0] = Node(p[1])
 
 def p_facts(p):
     '''facts : NUMBER
@@ -365,7 +366,7 @@ main {
     integer x;
     double y;
     if (x < 10) {
-        y = 3.14;
+        y = 3.14 / 3;
     } otherwise {
         y = 2.71;
     }
@@ -379,6 +380,47 @@ parser = yacc.yacc()
 # Parse the data
 result = parser.parse(data, lexer=lexer)
 
-# Render the tree
-for pre, fill, node in RenderTree(result):
-    print("%s%s" % (pre, node.name))
+# # Render the tree
+# for pre, fill, node in RenderTree(result):
+#     print("%s%s" % (pre, node.name))
+
+# Convertir el árbol a texto
+class MainWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super(MainWindow, self).__init__(parent)
+
+        self.setWindowTitle('RenderTree Viewer')
+        self.setGeometry(100, 100, 800, 600)
+
+        self.tree_widget = QTreeWidget()
+        self.tree_widget.setColumnCount(1)
+        self.tree_widget.setHeaderLabels(['AST'])
+
+        self.build_tree(result, None)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.tree_widget)
+
+        container = QWidget()
+        container.setLayout(layout)
+        self.setCentralWidget(container)
+
+    def build_tree(self, node, parent_item):
+        item = QTreeWidgetItem([node.name])
+        if parent_item is None:
+            self.tree_widget.addTopLevelItem(item)
+        else:
+            parent_item.addChild(item)
+
+        for child in node.children:
+            self.build_tree(child, item)
+
+if __name__ == "__main__":
+    app = QApplication([])
+    window = MainWindow()
+    window.show()
+    app.exec()
+
+def returnres(text):
+    result = parser.parse(data, lexer=lexer)
+    return result
