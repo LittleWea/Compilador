@@ -1,15 +1,20 @@
 from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog, QScrollArea
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QIcon, QWheelEvent
+from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QWheelEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
 from PyQt5 import QtMultimedia, QtCore, QtGui
-
+from anytree import RenderTree, Node
 import os, re
-
+import sys
+import json
+from anytree import Node, RenderTree
+from anytree.exporter import DotExporter
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
+from analLexico import lexer, tipoToken, Token
 
-from analLexico import lexer, tipoToken
+from analsint import parser, ASTNode
+#from analsint import analisis_sintactico, SyntaxError
 
 
 file_path_save = os.path.join(os.getcwd(), 'default.cps')
@@ -34,6 +39,7 @@ def handle_selection_change(index):
     else:
         print("Selected item:", selected_item)
     combo_box.setCurrentIndex(0)
+
 
 # Funcion para abrir archivos y escribir sobre el TextEdit
 def open_file():
@@ -75,7 +81,7 @@ def apply_syntax_highlighting():
 # Function to get color for a token type
 def get_color(token_type):
     if token_type == 'error':
-        return '##00FF0D'  # Default text color
+        return '#00FF0D'  # Default text color
     elif token_type == 'palabra reservada':
         return '#0000FF'  # Blue
     elif token_type == 'identificador':
@@ -90,11 +96,11 @@ def get_color(token_type):
         return '#00DDFF'  # Gray
     elif token_type == 'sibolo logico':
         return '#800080'  # Purple
-    elif token_type in ('simbolo parentesis'):
+    elif token_type in 'simbolo parentesis':
         return '#FF00FF'  # Magenta
-    elif token_type in ('simbolo corchete'):
+    elif token_type in 'simbolo corchete':
         return '#FFA500'  # Orange
-    elif token_type in ('simbolo llave'):
+    elif token_type in 'simbolo llave':
         return '#A52A2A'  # Brown
     elif token_type == 'simbolo puntuacion':
         return '#FFC0CB'  # Pink
@@ -151,23 +157,64 @@ def save_errors(tokens):
                 file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
 
 
+# Función principal para realizar el análisis léxico y sintáctico
 def lexic_anal():
     text = text_box.toPlainText()
     tokens = lexer(text)
     save_tokens(tokens)
     save_errors(tokens)
-    text = ''
-    textError = ''
+    text_tokens = ''
+    text_errors = ''
+    
+
     for token in tokens:
-        aux = tipoToken( token[0] )
+        aux = tipoToken(token[0])
         if aux != 'error':
-            text += "'" + token[0] + ': ' + str(aux) + "\n"
+            text_tokens += "'" + token[0] + ': ' + str(aux) + "\n"
         else:
-            textError += "'" + token[0] + "': " + str(aux) + " en columna: " + str(token[2]) + ", fila: " + str(token[1]) + "\n"
+            text_errors += "'" + token[0] + "': " + str(aux) + " en columna: " + str(token[2]) + ", fila: " + str(token[1]) + "\n"
+    # Actualizar los textos en las pestañas correspondientes
+    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text_tokens)
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(text_errors)
+
+#    result = parse(tokens)
+ #   tab_widget_1.widget(2).layout.itemAt(0).widget().setText(result)  
+# Función para generar el árbol de análisis sintáctico
+def generate_ast(result):
+    if isinstance(result, tuple):
+        node_type = result[0]  # Tipo del nodo es el primer elemento de la tupla
+        children = [generate_ast(child) for child in result[1:]]  # Generamos los hijos recursivamente
+        return ASTNode(node_type, children)
+    else:
+        return ASTNode(result)
+
+def visualize_ast(node, indent=''):
+    result = ""
+    result += f"{indent}├── {node.type}"  # Imprimir el tipo de nodo con la sangría actual
+    for child in node.children[:-1]:
+        result += visualize_ast(child.type, indent + "│   " )  # Llamar recursivamente a visualize_ast para los hijos
+    result += "\n"
+    if node.children:
+        result += visualize_ast(node.children[-1], indent + "|   ")  # El último hijo no necesita una barra vertical
+    return result
 
 
-    tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text)
-    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(textError)
+
+def sint_anal():
+    text = text_box.toPlainText()
+    try:
+        result = parser.parse(text)
+        ast = generate_ast(result)
+        tree_text = visualize_ast(ast)
+        tab_widget_1.widget(2).layout.itemAt(0).widget().setFont(QFont("Courier", 10))  # Establecer una fuente de ancho fijo
+        tab_widget_1.widget(2).layout.itemAt(0).widget().setText(tree_text)
+        tab_widget_1.widget(2).layout.itemAt(0).widget().setWordWrap(True) 
+        result_text = "Análisis sintáctico completado sin errores."
+    except Exception as e:
+        result_text = f"Error en el análisis sintáctico: {str(e)}"
+        tab_widget_1.widget(2).layout.itemAt(0).widget().setText(result_text)
+    tab_widget_2.widget(1).layout.itemAt(0).widget().setText(result_text)
+
 
 
 # Funcion para actualizar los numeros de linea
@@ -250,6 +297,11 @@ lexic_button.setIcon(QIcon('lex_icon.jpg'))  # Set the icon
 lexic_button.setIconSize(close_button.sizeHint())
 lexic_button.setToolTip('Lexic')
 lexic_button.clicked.connect(lexic_anal)
+
+sint_button = QPushButton('', window)
+sint_button.setIcon(QIcon('lex_icon.jpg'))  # Set the icon
+sint_button.setIconSize(close_button.sizeHint())
+sint_button.clicked.connect(sint_anal)
 
 # Agregar el boton anterior en el layout de menu
 menu_layout.addWidget(lexic_button)
@@ -337,6 +389,10 @@ for i in range(2):
     tab_widget_2.addTab(QWidget(), f'Tab {i+1}')
     tab_widget_2.widget(i).layout = QVBoxLayout()
     tab_widget_2.widget(i).layout.addWidget(label)
+    scroll_area1 = QScrollArea()
+    scroll_area1.setWidgetResizable(True)
+    scroll_area1.setWidget(label)
+    tab_widget_1.addTab(scroll_area1, f'Tab {i+1}')
     tab_widget_2.widget(i).setLayout(tab_widget_2.widget(i).layout)
     style = "background-color:"+colorsp2[i] + ";QTabBar::tab { color: black; }"
     tab_widget_2.widget(i).setStyleSheet(style)

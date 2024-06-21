@@ -1,9 +1,18 @@
 import re
 
+class Token:
+    def __init__(self, tipo, valor, fila, columna):
+        self.tipo = tipo
+        self.valor = valor
+        self.fila = fila
+        self.columna = columna
+
+    def __str__(self):
+        return f"Token({self.tipo}, {self.valor}, {self.fila}, {self.columna})"
+
 def lexer(expresion):
     tokens = []
-    # Definir patrones para los diferentes tokens
-    patron_palabra = r'\b[a-zñA-ZÑ_][a-zñA-ZÑ0-9_]*\b'
+    patron_palabra = r'\b[a-zñA-ZÑ_@][a-zñA-ZÑ0-9_@]*\b'
     patron_cadena_entre_dos_simbolos = r'##[^#]+##'
     patron_comentario = r'#[^\n]*'
     patron_simbolo_aritmetico = r'[\+\-\*/\^\%]'
@@ -72,6 +81,7 @@ def tipoToken(expresion):
     patron_punto = r'[\,\;]'
     patron_operadores_logicos = r'\|\||&&'
 
+
     patron_general = '|'.join([
             patron_cadena_entre_dos_simbolos,
             patron_com,
@@ -94,7 +104,7 @@ def tipoToken(expresion):
        (expresion == 'switch') | (expresion == 'case') | (expresion == 'integer') | (expresion == 'double') | 
        (expresion == 'main') | (expresion == 'return') | (expresion == 'else') | (expresion == 'cin') | (expresion == 'cout')):
         return 'palabra reservada'
-    elif(re.fullmatch(patron_cadena_entre_dos_simbolos, expresion)):
+    elif(re.fullmatch(patron_cadena_entre_dos_simbolos, expresion) or re.fullmatch(patron_com, expresion)):
         return 'comentario'
     elif(re.fullmatch(patron_palabra, expresion)):
         return 'identificador'
@@ -118,3 +128,4 @@ def tipoToken(expresion):
         return 'operador logico'
     elif (re.fullmatch(patron_general, expresion) == None):
         return 'error'
+    
