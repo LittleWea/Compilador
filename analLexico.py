@@ -24,7 +24,7 @@ def lexer(expresion):
     patron_corchetes = r'[\[\]]'
     patron_llaves = r'[\{\}]'
     patron_punto = r'[\,\;]'
-    patron_operadores_logicos = r'\b(AND|OR)\b'
+    patron_operadores_logicos = r'\|\||&&'
     patron_ignorar = r'[\n\s]+'
 
     patron_error = r'.'
@@ -77,7 +77,7 @@ def tipoToken(expresion):
     patron_corchetes = r'[\[\]]'
     patron_llaves = r'[\{\}]'
     patron_punto = r'[\,\;]'
-    patron_operadores_logicos = r'\b(AND|OR)\b'
+    patron_operadores_logicos = r'\|\||&&'
 
 
     patron_general = '|'.join([
@@ -101,7 +101,7 @@ def tipoToken(expresion):
        (expresion == 'switch') | (expresion == 'case') | (expresion == 'integer') | (expresion == 'double') | 
        (expresion == 'main') | (expresion == 'return') | (expresion == 'else') | (expresion == 'cin') | (expresion == 'cout')):
         return 'palabra reservada'
-    elif(re.fullmatch(patron_cadena_entre_dos_simbolos, expresion)):
+    elif(re.fullmatch(patron_cadena_entre_dos_simbolos, expresion) or re.fullmatch(patron_com, expresion)):
         return 'comentario'
     elif(re.fullmatch(patron_palabra, expresion)):
         return 'identificador'
