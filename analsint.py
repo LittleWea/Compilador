@@ -165,10 +165,9 @@ def p_variable(p):
     '''variable : variable COMMA IDENTIFIER
                 | IDENTIFIER'''
     if len(p) == 4:
-        p[1].children = list(p[1].children) + [Node(p[3])]
-        p[0] = p[1]
+        p[0] = Node('Variables', children=list(p[1].children) + [Node(p[3])])
     else:
-        p[0] = Node(p[1])
+        p[0] = Node('Variables', children=[Node(p[1])])
 
 def p_type(p):
     '''type : BOOLEAN
@@ -191,7 +190,8 @@ def p_statement(p):
                  | iteration_statement
                  | cin_statement
                  | cout_statement
-                 | switch_statement'''
+                 | switch_statement
+                 | doublefacts'''
     p[0] = p[1]
 
 def p_compound_statement(p):
@@ -272,7 +272,7 @@ def p_simple_expression(p):
 def p_sum_operator(p):
     '''sum_operator : SUM
                     | MINUS'''
-    p[0] = Node(p[1])
+    p[0] = str(p[1])
 
 def p_term(p):
     '''term : term mult_operator factor 
@@ -286,7 +286,7 @@ def p_mult_operator(p):
     '''mult_operator : TIMES
                      | DIVISION
                      | MODULE'''
-    p[0] = Node(p[1])
+    p[0] = str(p[1])
 
 def p_factor(p):
     '''factor : factor pot_operator component
@@ -300,10 +300,21 @@ def p_pot_operator(p):
     '''pot_operator : POW'''
     p[0] = Node(p[1])
 
+
+def p_doublefacts(p):
+    '''doublefacts : IDENTIFIER SUMDOUBLE DOTCOMMA
+                   | IDENTIFIER MINUSDOUBLE DOTCOMMA'''
+    if p[2] == '++':
+        p[0] = Node('Assign', children=[Node(p[1]), Node('+', children=[Node(p[1]), Node('1')])])
+    elif p[2] == '--':
+        p[0] = Node('Assign', children=[Node(p[1]), Node('-', children=[Node(p[1]), Node('1')])])
+
+
 def p_component(p):
     '''component : PARLEFT expression PARRIGHT
                  | IDENTIFIER
-                 | facts'''
+                 | facts
+                 | doublefacts'''
     if len(p) == 4:
         p[0] = p[2]
     else:
@@ -313,14 +324,18 @@ def p_facts(p):
     '''facts : NUMBER
              | REALNUMBER
              | BOOL'''
-    p[0] = Node(str(p[1]))
+    p[0] = str(p[1])
 
 def p_empty(p):
     'empty : '
     p[0] = Node('empty')
 
 errors = []
-
+'''def save_errors_to_file(errors, file_path):
+    with open(file_path, 'w', encoding='utf-8') as file:
+        for error in errors:
+            file.write(f"Line {error[0]}: {error[1]}\n")
+'''
 def p_error(p):
     global errors
     if p:
@@ -334,6 +349,7 @@ def p_error(p):
         line = 'EOF'
         print("Syntax error at EOF")
     errors.append((line, error_msg)) 
+    #save_errors_to_file(errors, "syntax_errors.txt")
    
 
 lexer = lex.lex()
@@ -353,7 +369,7 @@ main {
     x=(5-3)*(8/2);
     y=5+3-2*4/7-9;
     z=8/2+15*4;
-    y=14.54;;
+    y=14.54;
     if(2>3) {
         x=4+66;
         y=a+3;
@@ -368,6 +384,7 @@ main {
     } while(x>7);
     x=6+8/9*8/3;   
     cin x; 
+    y++;
     mas=36/7; 
     while(y==5){
         while(y==0){
@@ -421,5 +438,10 @@ if __name__ == "__main__":
 
 
 def returnres(text):
-    result = parser.parse(data, lexer=lexer)
-    return result
+    result = parser.parse(text, lexer=lexer)
+    global errors
+    errores = errors
+    total = []
+    total.append(errores)
+    total.append(result)
+    return total

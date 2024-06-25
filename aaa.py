@@ -156,13 +156,23 @@ def save_errors(tokens):
             if tipoToken(token[0]) == 'error':
                 file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
 
-
+def save_errors_to_file(errors, file_path):
+    aux = ''
+    with open(file_path, 'w', encoding='utf-8') as file:
+        for error in errors:
+            file.write(f"Line {error[0]}: {error[1]}\n")
+            aux += "Line" + str(error[0]) + ":" + error[1] + "\n"
+    print(aux)
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(aux)
+    
 def sint_anal():
     text = text_box.toPlainText()
     res = returnres(text)
     tree_widget.clear()
-    build_tree(res, None)
-    save_tree_to_file(res, "ast.txt")
+    build_tree(res[1], None)
+    save_tree_to_file(res[1], "ast.txt")
+    save_errors_to_file(res[0], "syntax_errors.txt")
+    
 
 def build_tree(node, parent_item):
     if node is None:
@@ -172,7 +182,7 @@ def build_tree(node, parent_item):
         tree_widget.addTopLevelItem(item)
     else:
         parent_item.addChild(item)
-
+    item.setExpanded(True)
     for child in node.children:
         build_tree(child, item)
 
@@ -182,7 +192,7 @@ def save_tree_to_file(node, file_path):
             file.write("%s%s\n" % (pre, n.name))
 
 
-# Función principal para realizar el análisis léxico y sintáctico
+# Función principal para realizar el análisis léxico
 def lexic_anal():
     text = text_box.toPlainText()
     tokens = lexer(text)
@@ -283,11 +293,11 @@ lexic_button.setIconSize(close_button.sizeHint())
 lexic_button.setToolTip('Lexic')
 lexic_button.clicked.connect(lexic_anal)
 
-sint_button = QPushButton('', window)
-sint_button.setIcon(QIcon('lex_icon.jpg'))  # Set the icon
-sint_button.setIconSize(close_button.sizeHint())
+#sint_button = QPushButton('', window)
+#sint_button.setIcon(QIcon('lex_icon.jpg'))  # Set the icon
+#sint_button.setIconSize(close_button.sizeHint())
 
-sint_button.clicked.connect(sint_anal)
+lexic_button.clicked.connect(sint_anal)
 
 # Agregar el boton anterior en el layout de menu
 menu_layout.addWidget(lexic_button)
@@ -375,10 +385,6 @@ for i in range(2):
     tab_widget_2.addTab(QWidget(), f'Tab {i+1}')
     tab_widget_2.widget(i).layout = QVBoxLayout()
     tab_widget_2.widget(i).layout.addWidget(label)
-    scroll_area1 = QScrollArea()
-    scroll_area1.setWidgetResizable(True)
-    scroll_area1.setWidget(label)
-    tab_widget_1.addTab(scroll_area1, f'Tab {i+1}')
     tab_widget_2.widget(i).setLayout(tab_widget_2.widget(i).layout)
     style = "background-color:"+colorsp2[i] + ";QTabBar::tab { color: black; }"
     tab_widget_2.widget(i).setStyleSheet(style)
