@@ -162,9 +162,12 @@ def sint_anal():
     res = returnres(text)
     tree_widget.clear()
     build_tree(res, None)
+    save_tree_to_file(res, "ast.txt")
 
 def build_tree(node, parent_item):
-    item = QTreeWidgetItem([node.name])
+    if node is None:
+        return
+    item = QTreeWidgetItem([str(node.name)])
     if parent_item is None:
         tree_widget.addTopLevelItem(item)
     else:
@@ -172,6 +175,12 @@ def build_tree(node, parent_item):
 
     for child in node.children:
         build_tree(child, item)
+
+def save_tree_to_file(node, file_path):
+    with open(file_path, 'w', encoding='utf-8') as file:
+        for pre, fill, n in RenderTree(node):
+            file.write("%s%s\n" % (pre, n.name))
+
 
 # Función principal para realizar el análisis léxico y sintáctico
 def lexic_anal():
