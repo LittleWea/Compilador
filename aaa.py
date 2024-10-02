@@ -175,6 +175,7 @@ def sint_anal():
     
 
 def build_tree(node, parent_item):
+    print(node)
     if node is None:
         return
     item = QTreeWidgetItem([str(node.name)])

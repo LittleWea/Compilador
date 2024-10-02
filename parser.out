@@ -1,0 +1,2189 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    FI
+    MULTIPLECOMMENT
+    RETURN
+    SINGLECOMMENT
+    SQRLEFT
+    SQRRIGHT
+
+Grammar
+
+Rule 0     S' -> program
+Rule 1     program -> main
+Rule 2     main -> MAIN KEYLEFT declarations KEYRIGHT
+Rule 3     declarations -> declarations declaration
+Rule 4     declarations -> declaration
+Rule 5     declaration -> declaration_variable
+Rule 6     declaration -> statement
+Rule 7     declaration_variable -> type variable DOTCOMMA
+Rule 8     variable -> variable COMMA IDENTIFIER
+Rule 9     variable -> IDENTIFIER
+Rule 10    type -> BOOLEAN
+Rule 11    type -> INTEGER
+Rule 12    type -> DOUBLE
+Rule 13    statements -> statements statement
+Rule 14    statements -> statement
+Rule 15    statement -> compound_statement
+Rule 16    statement -> assign_statement
+Rule 17    statement -> select_statement
+Rule 18    statement -> iteration_statement
+Rule 19    statement -> cin_statement
+Rule 20    statement -> cout_statement
+Rule 21    statement -> switch_statement
+Rule 22    statement -> doublefacts
+Rule 23    compound_statement -> KEYLEFT statements KEYRIGHT
+Rule 24    assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA
+Rule 25    select_statement -> IF PARLEFT expression PARRIGHT compound_statement
+Rule 26    select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+Rule 27    iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement
+Rule 28    iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+Rule 29    switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+Rule 30    case_list -> case_list case_statement
+Rule 31    case_list -> case_statement
+Rule 32    case_statement -> CASE facts DOUBLEDOT statements BREAK DOTCOMMA
+Rule 33    cin_statement -> CIN IDENTIFIER DOTCOMMA
+Rule 34    cout_statement -> COUT expression DOTCOMMA
+Rule 35    expression -> simple_expression relation_operator simple_expression
+Rule 36    expression -> simple_expression
+Rule 37    relation_operator -> EQUALS
+Rule 38    relation_operator -> NOTEQUAL
+Rule 39    relation_operator -> LESS
+Rule 40    relation_operator -> LESSEQUAL
+Rule 41    relation_operator -> GREAT
+Rule 42    relation_operator -> GREATEQUAL
+Rule 43    relation_operator -> AND
+Rule 44    relation_operator -> OR
+Rule 45    simple_expression -> simple_expression sum_operator term
+Rule 46    simple_expression -> term
+Rule 47    sum_operator -> SUM
+Rule 48    sum_operator -> MINUS
+Rule 49    term -> term mult_operator factor
+Rule 50    term -> factor
+Rule 51    mult_operator -> TIMES
+Rule 52    mult_operator -> DIVISION
+Rule 53    mult_operator -> MODULE
+Rule 54    factor -> factor pot_operator component
+Rule 55    factor -> component
+Rule 56    pot_operator -> POW
+Rule 57    doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA
+Rule 58    doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA
+Rule 59    component -> PARLEFT expression PARRIGHT
+Rule 60    component -> IDENTIFIER
+Rule 61    component -> facts
+Rule 62    component -> doublefacts
+Rule 63    facts -> NUMBER
+Rule 64    facts -> REALNUMBER
+Rule 65    facts -> BOOL
+Rule 66    empty -> <empty>
+
+Terminals, with rules where they appear
+
+AND                  : 43
+ASSIGN               : 24
+BOOL                 : 65
+BOOLEAN              : 10
+BREAK                : 32
+CASE                 : 32
+CIN                  : 33
+COMMA                : 8
+COUT                 : 34
+DIVISION             : 52
+DO                   : 28
+DOTCOMMA             : 7 24 28 32 33 34 57 58
+DOUBLE               : 12
+DOUBLEDOT            : 32
+EQUALS               : 37
+FI                   : 
+GREAT                : 41
+GREATEQUAL           : 42
+IDENTIFIER           : 8 9 24 33 57 58 60
+IF                   : 25 26
+INTEGER              : 11
+KEYLEFT              : 2 23 29
+KEYRIGHT             : 2 23 29
+LESS                 : 39
+LESSEQUAL            : 40
+MAIN                 : 2
+MINUS                : 48
+MINUSDOUBLE          : 58
+MODULE               : 53
+MULTIPLECOMMENT      : 
+NOTEQUAL             : 38
+NUMBER               : 63
+OR                   : 44
+OTHERWISE            : 26
+PARLEFT              : 25 26 27 28 29 59
+PARRIGHT             : 25 26 27 28 29 59
+POW                  : 56
+REALNUMBER           : 64
+RETURN               : 
+SINGLECOMMENT        : 
+SQRLEFT              : 
+SQRRIGHT             : 
+SUM                  : 47
+SUMDOUBLE            : 57
+SWITCH               : 29
+TIMES                : 51
+WHILE                : 27 28
+error                : 
+
+Nonterminals, with rules where they appear
+
+assign_statement     : 16
+case_list            : 29 30
+case_statement       : 30 31
+cin_statement        : 19
+component            : 54 55
+compound_statement   : 15 25 26 26 27 28
+cout_statement       : 20
+declaration          : 3 4
+declaration_variable : 5
+declarations         : 2 3
+doublefacts          : 22 62
+empty                : 
+expression           : 24 25 26 27 28 29 34 59
+factor               : 49 50 54
+facts                : 32 61
+iteration_statement  : 18
+main                 : 1
+mult_operator        : 49
+pot_operator         : 54
+program              : 0
+relation_operator    : 35
+select_statement     : 17
+simple_expression    : 35 35 36 45
+statement            : 6 13 14
+statements           : 13 23 32
+sum_operator         : 45
+switch_statement     : 21
+term                 : 45 46 49
+type                 : 7
+variable             : 7 8
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . program
+    (1) program -> . main
+    (2) main -> . MAIN KEYLEFT declarations KEYRIGHT
+
+    MAIN            shift and go to state 3
+
+    program                        shift and go to state 1
+    main                           shift and go to state 2
+
+state 1
+
+    (0) S' -> program .
+
+
+
+state 2
+
+    (1) program -> main .
+
+    $end            reduce using rule 1 (program -> main .)
+
+
+state 3
+
+    (2) main -> MAIN . KEYLEFT declarations KEYRIGHT
+
+    KEYLEFT         shift and go to state 4
+
+
+state 4
+
+    (2) main -> MAIN KEYLEFT . declarations KEYRIGHT
+    (3) declarations -> . declarations declaration
+    (4) declarations -> . declaration
+    (5) declaration -> . declaration_variable
+    (6) declaration -> . statement
+    (7) declaration_variable -> . type variable DOTCOMMA
+    (15) statement -> . compound_statement
+    (16) statement -> . assign_statement
+    (17) statement -> . select_statement
+    (18) statement -> . iteration_statement
+    (19) statement -> . cin_statement
+    (20) statement -> . cout_statement
+    (21) statement -> . switch_statement
+    (22) statement -> . doublefacts
+    (10) type -> . BOOLEAN
+    (11) type -> . INTEGER
+    (12) type -> . DOUBLE
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+    (24) assign_statement -> . IDENTIFIER ASSIGN expression DOTCOMMA
+    (25) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement
+    (26) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+    (27) iteration_statement -> . WHILE PARLEFT expression PARRIGHT compound_statement
+    (28) iteration_statement -> . DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+    (33) cin_statement -> . CIN IDENTIFIER DOTCOMMA
+    (34) cout_statement -> . COUT expression DOTCOMMA
+    (29) switch_statement -> . SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    BOOLEAN         shift and go to state 19
+    INTEGER         shift and go to state 20
+    DOUBLE          shift and go to state 21
+    KEYLEFT         shift and go to state 5
+    IDENTIFIER      shift and go to state 22
+    IF              shift and go to state 23
+    WHILE           shift and go to state 24
+    DO              shift and go to state 25
+    CIN             shift and go to state 26
+    COUT            shift and go to state 27
+    SWITCH          shift and go to state 28
+
+    declarations                   shift and go to state 6
+    declaration                    shift and go to state 7
+    declaration_variable           shift and go to state 8
+    statement                      shift and go to state 9
+    type                           shift and go to state 10
+    compound_statement             shift and go to state 11
+    assign_statement               shift and go to state 12
+    select_statement               shift and go to state 13
+    iteration_statement            shift and go to state 14
+    cin_statement                  shift and go to state 15
+    cout_statement                 shift and go to state 16
+    switch_statement               shift and go to state 17
+    doublefacts                    shift and go to state 18
+
+state 5
+
+    (23) compound_statement -> KEYLEFT . statements KEYRIGHT
+    (13) statements -> . statements statement
+    (14) statements -> . statement
+    (15) statement -> . compound_statement
+    (16) statement -> . assign_statement
+    (17) statement -> . select_statement
+    (18) statement -> . iteration_statement
+    (19) statement -> . cin_statement
+    (20) statement -> . cout_statement
+    (21) statement -> . switch_statement
+    (22) statement -> . doublefacts
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+    (24) assign_statement -> . IDENTIFIER ASSIGN expression DOTCOMMA
+    (25) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement
+    (26) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+    (27) iteration_statement -> . WHILE PARLEFT expression PARRIGHT compound_statement
+    (28) iteration_statement -> . DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+    (33) cin_statement -> . CIN IDENTIFIER DOTCOMMA
+    (34) cout_statement -> . COUT expression DOTCOMMA
+    (29) switch_statement -> . SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    KEYLEFT         shift and go to state 5
+    IDENTIFIER      shift and go to state 22
+    IF              shift and go to state 23
+    WHILE           shift and go to state 24
+    DO              shift and go to state 25
+    CIN             shift and go to state 26
+    COUT            shift and go to state 27
+    SWITCH          shift and go to state 28
+
+    statements                     shift and go to state 29
+    statement                      shift and go to state 30
+    compound_statement             shift and go to state 11
+    assign_statement               shift and go to state 12
+    select_statement               shift and go to state 13
+    iteration_statement            shift and go to state 14
+    cin_statement                  shift and go to state 15
+    cout_statement                 shift and go to state 16
+    switch_statement               shift and go to state 17
+    doublefacts                    shift and go to state 18
+
+state 6
+
+    (2) main -> MAIN KEYLEFT declarations . KEYRIGHT
+    (3) declarations -> declarations . declaration
+    (5) declaration -> . declaration_variable
+    (6) declaration -> . statement
+    (7) declaration_variable -> . type variable DOTCOMMA
+    (15) statement -> . compound_statement
+    (16) statement -> . assign_statement
+    (17) statement -> . select_statement
+    (18) statement -> . iteration_statement
+    (19) statement -> . cin_statement
+    (20) statement -> . cout_statement
+    (21) statement -> . switch_statement
+    (22) statement -> . doublefacts
+    (10) type -> . BOOLEAN
+    (11) type -> . INTEGER
+    (12) type -> . DOUBLE
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+    (24) assign_statement -> . IDENTIFIER ASSIGN expression DOTCOMMA
+    (25) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement
+    (26) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+    (27) iteration_statement -> . WHILE PARLEFT expression PARRIGHT compound_statement
+    (28) iteration_statement -> . DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+    (33) cin_statement -> . CIN IDENTIFIER DOTCOMMA
+    (34) cout_statement -> . COUT expression DOTCOMMA
+    (29) switch_statement -> . SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    KEYRIGHT        shift and go to state 31
+    BOOLEAN         shift and go to state 19
+    INTEGER         shift and go to state 20
+    DOUBLE          shift and go to state 21
+    KEYLEFT         shift and go to state 5
+    IDENTIFIER      shift and go to state 22
+    IF              shift and go to state 23
+    WHILE           shift and go to state 24
+    DO              shift and go to state 25
+    CIN             shift and go to state 26
+    COUT            shift and go to state 27
+    SWITCH          shift and go to state 28
+
+    declaration                    shift and go to state 32
+    declaration_variable           shift and go to state 8
+    statement                      shift and go to state 9
+    type                           shift and go to state 10
+    compound_statement             shift and go to state 11
+    assign_statement               shift and go to state 12
+    select_statement               shift and go to state 13
+    iteration_statement            shift and go to state 14
+    cin_statement                  shift and go to state 15
+    cout_statement                 shift and go to state 16
+    switch_statement               shift and go to state 17
+    doublefacts                    shift and go to state 18
+
+state 7
+
+    (4) declarations -> declaration .
+
+    KEYRIGHT        reduce using rule 4 (declarations -> declaration .)
+    BOOLEAN         reduce using rule 4 (declarations -> declaration .)
+    INTEGER         reduce using rule 4 (declarations -> declaration .)
+    DOUBLE          reduce using rule 4 (declarations -> declaration .)
+    KEYLEFT         reduce using rule 4 (declarations -> declaration .)
+    IDENTIFIER      reduce using rule 4 (declarations -> declaration .)
+    IF              reduce using rule 4 (declarations -> declaration .)
+    WHILE           reduce using rule 4 (declarations -> declaration .)
+    DO              reduce using rule 4 (declarations -> declaration .)
+    CIN             reduce using rule 4 (declarations -> declaration .)
+    COUT            reduce using rule 4 (declarations -> declaration .)
+    SWITCH          reduce using rule 4 (declarations -> declaration .)
+
+
+state 8
+
+    (5) declaration -> declaration_variable .
+
+    KEYRIGHT        reduce using rule 5 (declaration -> declaration_variable .)
+    BOOLEAN         reduce using rule 5 (declaration -> declaration_variable .)
+    INTEGER         reduce using rule 5 (declaration -> declaration_variable .)
+    DOUBLE          reduce using rule 5 (declaration -> declaration_variable .)
+    KEYLEFT         reduce using rule 5 (declaration -> declaration_variable .)
+    IDENTIFIER      reduce using rule 5 (declaration -> declaration_variable .)
+    IF              reduce using rule 5 (declaration -> declaration_variable .)
+    WHILE           reduce using rule 5 (declaration -> declaration_variable .)
+    DO              reduce using rule 5 (declaration -> declaration_variable .)
+    CIN             reduce using rule 5 (declaration -> declaration_variable .)
+    COUT            reduce using rule 5 (declaration -> declaration_variable .)
+    SWITCH          reduce using rule 5 (declaration -> declaration_variable .)
+
+
+state 9
+
+    (6) declaration -> statement .
+
+    KEYRIGHT        reduce using rule 6 (declaration -> statement .)
+    BOOLEAN         reduce using rule 6 (declaration -> statement .)
+    INTEGER         reduce using rule 6 (declaration -> statement .)
+    DOUBLE          reduce using rule 6 (declaration -> statement .)
+    KEYLEFT         reduce using rule 6 (declaration -> statement .)
+    IDENTIFIER      reduce using rule 6 (declaration -> statement .)
+    IF              reduce using rule 6 (declaration -> statement .)
+    WHILE           reduce using rule 6 (declaration -> statement .)
+    DO              reduce using rule 6 (declaration -> statement .)
+    CIN             reduce using rule 6 (declaration -> statement .)
+    COUT            reduce using rule 6 (declaration -> statement .)
+    SWITCH          reduce using rule 6 (declaration -> statement .)
+
+
+state 10
+
+    (7) declaration_variable -> type . variable DOTCOMMA
+    (8) variable -> . variable COMMA IDENTIFIER
+    (9) variable -> . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 34
+
+    variable                       shift and go to state 33
+
+state 11
+
+    (15) statement -> compound_statement .
+
+    KEYRIGHT        reduce using rule 15 (statement -> compound_statement .)
+    BOOLEAN         reduce using rule 15 (statement -> compound_statement .)
+    INTEGER         reduce using rule 15 (statement -> compound_statement .)
+    DOUBLE          reduce using rule 15 (statement -> compound_statement .)
+    KEYLEFT         reduce using rule 15 (statement -> compound_statement .)
+    IDENTIFIER      reduce using rule 15 (statement -> compound_statement .)
+    IF              reduce using rule 15 (statement -> compound_statement .)
+    WHILE           reduce using rule 15 (statement -> compound_statement .)
+    DO              reduce using rule 15 (statement -> compound_statement .)
+    CIN             reduce using rule 15 (statement -> compound_statement .)
+    COUT            reduce using rule 15 (statement -> compound_statement .)
+    SWITCH          reduce using rule 15 (statement -> compound_statement .)
+    BREAK           reduce using rule 15 (statement -> compound_statement .)
+
+
+state 12
+
+    (16) statement -> assign_statement .
+
+    KEYRIGHT        reduce using rule 16 (statement -> assign_statement .)
+    BOOLEAN         reduce using rule 16 (statement -> assign_statement .)
+    INTEGER         reduce using rule 16 (statement -> assign_statement .)
+    DOUBLE          reduce using rule 16 (statement -> assign_statement .)
+    KEYLEFT         reduce using rule 16 (statement -> assign_statement .)
+    IDENTIFIER      reduce using rule 16 (statement -> assign_statement .)
+    IF              reduce using rule 16 (statement -> assign_statement .)
+    WHILE           reduce using rule 16 (statement -> assign_statement .)
+    DO              reduce using rule 16 (statement -> assign_statement .)
+    CIN             reduce using rule 16 (statement -> assign_statement .)
+    COUT            reduce using rule 16 (statement -> assign_statement .)
+    SWITCH          reduce using rule 16 (statement -> assign_statement .)
+    BREAK           reduce using rule 16 (statement -> assign_statement .)
+
+
+state 13
+
+    (17) statement -> select_statement .
+
+    KEYRIGHT        reduce using rule 17 (statement -> select_statement .)
+    BOOLEAN         reduce using rule 17 (statement -> select_statement .)
+    INTEGER         reduce using rule 17 (statement -> select_statement .)
+    DOUBLE          reduce using rule 17 (statement -> select_statement .)
+    KEYLEFT         reduce using rule 17 (statement -> select_statement .)
+    IDENTIFIER      reduce using rule 17 (statement -> select_statement .)
+    IF              reduce using rule 17 (statement -> select_statement .)
+    WHILE           reduce using rule 17 (statement -> select_statement .)
+    DO              reduce using rule 17 (statement -> select_statement .)
+    CIN             reduce using rule 17 (statement -> select_statement .)
+    COUT            reduce using rule 17 (statement -> select_statement .)
+    SWITCH          reduce using rule 17 (statement -> select_statement .)
+    BREAK           reduce using rule 17 (statement -> select_statement .)
+
+
+state 14
+
+    (18) statement -> iteration_statement .
+
+    KEYRIGHT        reduce using rule 18 (statement -> iteration_statement .)
+    BOOLEAN         reduce using rule 18 (statement -> iteration_statement .)
+    INTEGER         reduce using rule 18 (statement -> iteration_statement .)
+    DOUBLE          reduce using rule 18 (statement -> iteration_statement .)
+    KEYLEFT         reduce using rule 18 (statement -> iteration_statement .)
+    IDENTIFIER      reduce using rule 18 (statement -> iteration_statement .)
+    IF              reduce using rule 18 (statement -> iteration_statement .)
+    WHILE           reduce using rule 18 (statement -> iteration_statement .)
+    DO              reduce using rule 18 (statement -> iteration_statement .)
+    CIN             reduce using rule 18 (statement -> iteration_statement .)
+    COUT            reduce using rule 18 (statement -> iteration_statement .)
+    SWITCH          reduce using rule 18 (statement -> iteration_statement .)
+    BREAK           reduce using rule 18 (statement -> iteration_statement .)
+
+
+state 15
+
+    (19) statement -> cin_statement .
+
+    KEYRIGHT        reduce using rule 19 (statement -> cin_statement .)
+    BOOLEAN         reduce using rule 19 (statement -> cin_statement .)
+    INTEGER         reduce using rule 19 (statement -> cin_statement .)
+    DOUBLE          reduce using rule 19 (statement -> cin_statement .)
+    KEYLEFT         reduce using rule 19 (statement -> cin_statement .)
+    IDENTIFIER      reduce using rule 19 (statement -> cin_statement .)
+    IF              reduce using rule 19 (statement -> cin_statement .)
+    WHILE           reduce using rule 19 (statement -> cin_statement .)
+    DO              reduce using rule 19 (statement -> cin_statement .)
+    CIN             reduce using rule 19 (statement -> cin_statement .)
+    COUT            reduce using rule 19 (statement -> cin_statement .)
+    SWITCH          reduce using rule 19 (statement -> cin_statement .)
+    BREAK           reduce using rule 19 (statement -> cin_statement .)
+
+
+state 16
+
+    (20) statement -> cout_statement .
+
+    KEYRIGHT        reduce using rule 20 (statement -> cout_statement .)
+    BOOLEAN         reduce using rule 20 (statement -> cout_statement .)
+    INTEGER         reduce using rule 20 (statement -> cout_statement .)
+    DOUBLE          reduce using rule 20 (statement -> cout_statement .)
+    KEYLEFT         reduce using rule 20 (statement -> cout_statement .)
+    IDENTIFIER      reduce using rule 20 (statement -> cout_statement .)
+    IF              reduce using rule 20 (statement -> cout_statement .)
+    WHILE           reduce using rule 20 (statement -> cout_statement .)
+    DO              reduce using rule 20 (statement -> cout_statement .)
+    CIN             reduce using rule 20 (statement -> cout_statement .)
+    COUT            reduce using rule 20 (statement -> cout_statement .)
+    SWITCH          reduce using rule 20 (statement -> cout_statement .)
+    BREAK           reduce using rule 20 (statement -> cout_statement .)
+
+
+state 17
+
+    (21) statement -> switch_statement .
+
+    KEYRIGHT        reduce using rule 21 (statement -> switch_statement .)
+    BOOLEAN         reduce using rule 21 (statement -> switch_statement .)
+    INTEGER         reduce using rule 21 (statement -> switch_statement .)
+    DOUBLE          reduce using rule 21 (statement -> switch_statement .)
+    KEYLEFT         reduce using rule 21 (statement -> switch_statement .)
+    IDENTIFIER      reduce using rule 21 (statement -> switch_statement .)
+    IF              reduce using rule 21 (statement -> switch_statement .)
+    WHILE           reduce using rule 21 (statement -> switch_statement .)
+    DO              reduce using rule 21 (statement -> switch_statement .)
+    CIN             reduce using rule 21 (statement -> switch_statement .)
+    COUT            reduce using rule 21 (statement -> switch_statement .)
+    SWITCH          reduce using rule 21 (statement -> switch_statement .)
+    BREAK           reduce using rule 21 (statement -> switch_statement .)
+
+
+state 18
+
+    (22) statement -> doublefacts .
+
+    KEYRIGHT        reduce using rule 22 (statement -> doublefacts .)
+    BOOLEAN         reduce using rule 22 (statement -> doublefacts .)
+    INTEGER         reduce using rule 22 (statement -> doublefacts .)
+    DOUBLE          reduce using rule 22 (statement -> doublefacts .)
+    KEYLEFT         reduce using rule 22 (statement -> doublefacts .)
+    IDENTIFIER      reduce using rule 22 (statement -> doublefacts .)
+    IF              reduce using rule 22 (statement -> doublefacts .)
+    WHILE           reduce using rule 22 (statement -> doublefacts .)
+    DO              reduce using rule 22 (statement -> doublefacts .)
+    CIN             reduce using rule 22 (statement -> doublefacts .)
+    COUT            reduce using rule 22 (statement -> doublefacts .)
+    SWITCH          reduce using rule 22 (statement -> doublefacts .)
+    BREAK           reduce using rule 22 (statement -> doublefacts .)
+
+
+state 19
+
+    (10) type -> BOOLEAN .
+
+    IDENTIFIER      reduce using rule 10 (type -> BOOLEAN .)
+
+
+state 20
+
+    (11) type -> INTEGER .
+
+    IDENTIFIER      reduce using rule 11 (type -> INTEGER .)
+
+
+state 21
+
+    (12) type -> DOUBLE .
+
+    IDENTIFIER      reduce using rule 12 (type -> DOUBLE .)
+
+
+state 22
+
+    (24) assign_statement -> IDENTIFIER . ASSIGN expression DOTCOMMA
+    (57) doublefacts -> IDENTIFIER . SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> IDENTIFIER . MINUSDOUBLE DOTCOMMA
+
+    ASSIGN          shift and go to state 35
+    SUMDOUBLE       shift and go to state 36
+    MINUSDOUBLE     shift and go to state 37
+
+
+state 23
+
+    (25) select_statement -> IF . PARLEFT expression PARRIGHT compound_statement
+    (26) select_statement -> IF . PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+
+    PARLEFT         shift and go to state 38
+
+
+state 24
+
+    (27) iteration_statement -> WHILE . PARLEFT expression PARRIGHT compound_statement
+
+    PARLEFT         shift and go to state 39
+
+
+state 25
+
+    (28) iteration_statement -> DO . compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+
+    KEYLEFT         shift and go to state 5
+
+    compound_statement             shift and go to state 40
+
+state 26
+
+    (33) cin_statement -> CIN . IDENTIFIER DOTCOMMA
+
+    IDENTIFIER      shift and go to state 41
+
+
+state 27
+
+    (34) cout_statement -> COUT . expression DOTCOMMA
+    (35) expression -> . simple_expression relation_operator simple_expression
+    (36) expression -> . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    expression                     shift and go to state 42
+    simple_expression              shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 28
+
+    (29) switch_statement -> SWITCH . PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+
+    PARLEFT         shift and go to state 54
+
+
+state 29
+
+    (23) compound_statement -> KEYLEFT statements . KEYRIGHT
+    (13) statements -> statements . statement
+    (15) statement -> . compound_statement
+    (16) statement -> . assign_statement
+    (17) statement -> . select_statement
+    (18) statement -> . iteration_statement
+    (19) statement -> . cin_statement
+    (20) statement -> . cout_statement
+    (21) statement -> . switch_statement
+    (22) statement -> . doublefacts
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+    (24) assign_statement -> . IDENTIFIER ASSIGN expression DOTCOMMA
+    (25) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement
+    (26) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+    (27) iteration_statement -> . WHILE PARLEFT expression PARRIGHT compound_statement
+    (28) iteration_statement -> . DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+    (33) cin_statement -> . CIN IDENTIFIER DOTCOMMA
+    (34) cout_statement -> . COUT expression DOTCOMMA
+    (29) switch_statement -> . SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    KEYRIGHT        shift and go to state 55
+    KEYLEFT         shift and go to state 5
+    IDENTIFIER      shift and go to state 22
+    IF              shift and go to state 23
+    WHILE           shift and go to state 24
+    DO              shift and go to state 25
+    CIN             shift and go to state 26
+    COUT            shift and go to state 27
+    SWITCH          shift and go to state 28
+
+    statement                      shift and go to state 56
+    compound_statement             shift and go to state 11
+    assign_statement               shift and go to state 12
+    select_statement               shift and go to state 13
+    iteration_statement            shift and go to state 14
+    cin_statement                  shift and go to state 15
+    cout_statement                 shift and go to state 16
+    switch_statement               shift and go to state 17
+    doublefacts                    shift and go to state 18
+
+state 30
+
+    (14) statements -> statement .
+
+    KEYRIGHT        reduce using rule 14 (statements -> statement .)
+    KEYLEFT         reduce using rule 14 (statements -> statement .)
+    IDENTIFIER      reduce using rule 14 (statements -> statement .)
+    IF              reduce using rule 14 (statements -> statement .)
+    WHILE           reduce using rule 14 (statements -> statement .)
+    DO              reduce using rule 14 (statements -> statement .)
+    CIN             reduce using rule 14 (statements -> statement .)
+    COUT            reduce using rule 14 (statements -> statement .)
+    SWITCH          reduce using rule 14 (statements -> statement .)
+    BREAK           reduce using rule 14 (statements -> statement .)
+
+
+state 31
+
+    (2) main -> MAIN KEYLEFT declarations KEYRIGHT .
+
+    $end            reduce using rule 2 (main -> MAIN KEYLEFT declarations KEYRIGHT .)
+
+
+state 32
+
+    (3) declarations -> declarations declaration .
+
+    KEYRIGHT        reduce using rule 3 (declarations -> declarations declaration .)
+    BOOLEAN         reduce using rule 3 (declarations -> declarations declaration .)
+    INTEGER         reduce using rule 3 (declarations -> declarations declaration .)
+    DOUBLE          reduce using rule 3 (declarations -> declarations declaration .)
+    KEYLEFT         reduce using rule 3 (declarations -> declarations declaration .)
+    IDENTIFIER      reduce using rule 3 (declarations -> declarations declaration .)
+    IF              reduce using rule 3 (declarations -> declarations declaration .)
+    WHILE           reduce using rule 3 (declarations -> declarations declaration .)
+    DO              reduce using rule 3 (declarations -> declarations declaration .)
+    CIN             reduce using rule 3 (declarations -> declarations declaration .)
+    COUT            reduce using rule 3 (declarations -> declarations declaration .)
+    SWITCH          reduce using rule 3 (declarations -> declarations declaration .)
+
+
+state 33
+
+    (7) declaration_variable -> type variable . DOTCOMMA
+    (8) variable -> variable . COMMA IDENTIFIER
+
+    DOTCOMMA        shift and go to state 57
+    COMMA           shift and go to state 58
+
+
+state 34
+
+    (9) variable -> IDENTIFIER .
+
+    DOTCOMMA        reduce using rule 9 (variable -> IDENTIFIER .)
+    COMMA           reduce using rule 9 (variable -> IDENTIFIER .)
+
+
+state 35
+
+    (24) assign_statement -> IDENTIFIER ASSIGN . expression DOTCOMMA
+    (35) expression -> . simple_expression relation_operator simple_expression
+    (36) expression -> . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    expression                     shift and go to state 59
+    simple_expression              shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 36
+
+    (57) doublefacts -> IDENTIFIER SUMDOUBLE . DOTCOMMA
+
+    DOTCOMMA        shift and go to state 60
+
+
+state 37
+
+    (58) doublefacts -> IDENTIFIER MINUSDOUBLE . DOTCOMMA
+
+    DOTCOMMA        shift and go to state 61
+
+
+state 38
+
+    (25) select_statement -> IF PARLEFT . expression PARRIGHT compound_statement
+    (26) select_statement -> IF PARLEFT . expression PARRIGHT compound_statement OTHERWISE compound_statement
+    (35) expression -> . simple_expression relation_operator simple_expression
+    (36) expression -> . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    expression                     shift and go to state 62
+    simple_expression              shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 39
+
+    (27) iteration_statement -> WHILE PARLEFT . expression PARRIGHT compound_statement
+    (35) expression -> . simple_expression relation_operator simple_expression
+    (36) expression -> . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    expression                     shift and go to state 63
+    simple_expression              shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 40
+
+    (28) iteration_statement -> DO compound_statement . WHILE PARLEFT expression PARRIGHT DOTCOMMA
+
+    WHILE           shift and go to state 64
+
+
+state 41
+
+    (33) cin_statement -> CIN IDENTIFIER . DOTCOMMA
+
+    DOTCOMMA        shift and go to state 65
+
+
+state 42
+
+    (34) cout_statement -> COUT expression . DOTCOMMA
+
+    DOTCOMMA        shift and go to state 66
+
+
+state 43
+
+    (35) expression -> simple_expression . relation_operator simple_expression
+    (36) expression -> simple_expression .
+    (45) simple_expression -> simple_expression . sum_operator term
+    (37) relation_operator -> . EQUALS
+    (38) relation_operator -> . NOTEQUAL
+    (39) relation_operator -> . LESS
+    (40) relation_operator -> . LESSEQUAL
+    (41) relation_operator -> . GREAT
+    (42) relation_operator -> . GREATEQUAL
+    (43) relation_operator -> . AND
+    (44) relation_operator -> . OR
+    (47) sum_operator -> . SUM
+    (48) sum_operator -> . MINUS
+
+    DOTCOMMA        reduce using rule 36 (expression -> simple_expression .)
+    PARRIGHT        reduce using rule 36 (expression -> simple_expression .)
+    EQUALS          shift and go to state 69
+    NOTEQUAL        shift and go to state 70
+    LESS            shift and go to state 71
+    LESSEQUAL       shift and go to state 72
+    GREAT           shift and go to state 73
+    GREATEQUAL      shift and go to state 74
+    AND             shift and go to state 75
+    OR              shift and go to state 76
+    SUM             shift and go to state 77
+    MINUS           shift and go to state 78
+
+    relation_operator              shift and go to state 67
+    sum_operator                   shift and go to state 68
+
+state 44
+
+    (46) simple_expression -> term .
+    (49) term -> term . mult_operator factor
+    (51) mult_operator -> . TIMES
+    (52) mult_operator -> . DIVISION
+    (53) mult_operator -> . MODULE
+
+    EQUALS          reduce using rule 46 (simple_expression -> term .)
+    NOTEQUAL        reduce using rule 46 (simple_expression -> term .)
+    LESS            reduce using rule 46 (simple_expression -> term .)
+    LESSEQUAL       reduce using rule 46 (simple_expression -> term .)
+    GREAT           reduce using rule 46 (simple_expression -> term .)
+    GREATEQUAL      reduce using rule 46 (simple_expression -> term .)
+    AND             reduce using rule 46 (simple_expression -> term .)
+    OR              reduce using rule 46 (simple_expression -> term .)
+    SUM             reduce using rule 46 (simple_expression -> term .)
+    MINUS           reduce using rule 46 (simple_expression -> term .)
+    DOTCOMMA        reduce using rule 46 (simple_expression -> term .)
+    PARRIGHT        reduce using rule 46 (simple_expression -> term .)
+    TIMES           shift and go to state 80
+    DIVISION        shift and go to state 81
+    MODULE          shift and go to state 82
+
+    mult_operator                  shift and go to state 79
+
+state 45
+
+    (50) term -> factor .
+    (54) factor -> factor . pot_operator component
+    (56) pot_operator -> . POW
+
+    TIMES           reduce using rule 50 (term -> factor .)
+    DIVISION        reduce using rule 50 (term -> factor .)
+    MODULE          reduce using rule 50 (term -> factor .)
+    EQUALS          reduce using rule 50 (term -> factor .)
+    NOTEQUAL        reduce using rule 50 (term -> factor .)
+    LESS            reduce using rule 50 (term -> factor .)
+    LESSEQUAL       reduce using rule 50 (term -> factor .)
+    GREAT           reduce using rule 50 (term -> factor .)
+    GREATEQUAL      reduce using rule 50 (term -> factor .)
+    AND             reduce using rule 50 (term -> factor .)
+    OR              reduce using rule 50 (term -> factor .)
+    SUM             reduce using rule 50 (term -> factor .)
+    MINUS           reduce using rule 50 (term -> factor .)
+    DOTCOMMA        reduce using rule 50 (term -> factor .)
+    PARRIGHT        reduce using rule 50 (term -> factor .)
+    POW             shift and go to state 84
+
+    pot_operator                   shift and go to state 83
+
+state 46
+
+    (55) factor -> component .
+
+    POW             reduce using rule 55 (factor -> component .)
+    TIMES           reduce using rule 55 (factor -> component .)
+    DIVISION        reduce using rule 55 (factor -> component .)
+    MODULE          reduce using rule 55 (factor -> component .)
+    EQUALS          reduce using rule 55 (factor -> component .)
+    NOTEQUAL        reduce using rule 55 (factor -> component .)
+    LESS            reduce using rule 55 (factor -> component .)
+    LESSEQUAL       reduce using rule 55 (factor -> component .)
+    GREAT           reduce using rule 55 (factor -> component .)
+    GREATEQUAL      reduce using rule 55 (factor -> component .)
+    AND             reduce using rule 55 (factor -> component .)
+    OR              reduce using rule 55 (factor -> component .)
+    SUM             reduce using rule 55 (factor -> component .)
+    MINUS           reduce using rule 55 (factor -> component .)
+    DOTCOMMA        reduce using rule 55 (factor -> component .)
+    PARRIGHT        reduce using rule 55 (factor -> component .)
+
+
+state 47
+
+    (59) component -> PARLEFT . expression PARRIGHT
+    (35) expression -> . simple_expression relation_operator simple_expression
+    (36) expression -> . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    expression                     shift and go to state 85
+    simple_expression              shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 48
+
+    (60) component -> IDENTIFIER .
+    (57) doublefacts -> IDENTIFIER . SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> IDENTIFIER . MINUSDOUBLE DOTCOMMA
+
+    POW             reduce using rule 60 (component -> IDENTIFIER .)
+    TIMES           reduce using rule 60 (component -> IDENTIFIER .)
+    DIVISION        reduce using rule 60 (component -> IDENTIFIER .)
+    MODULE          reduce using rule 60 (component -> IDENTIFIER .)
+    EQUALS          reduce using rule 60 (component -> IDENTIFIER .)
+    NOTEQUAL        reduce using rule 60 (component -> IDENTIFIER .)
+    LESS            reduce using rule 60 (component -> IDENTIFIER .)
+    LESSEQUAL       reduce using rule 60 (component -> IDENTIFIER .)
+    GREAT           reduce using rule 60 (component -> IDENTIFIER .)
+    GREATEQUAL      reduce using rule 60 (component -> IDENTIFIER .)
+    AND             reduce using rule 60 (component -> IDENTIFIER .)
+    OR              reduce using rule 60 (component -> IDENTIFIER .)
+    SUM             reduce using rule 60 (component -> IDENTIFIER .)
+    MINUS           reduce using rule 60 (component -> IDENTIFIER .)
+    DOTCOMMA        reduce using rule 60 (component -> IDENTIFIER .)
+    PARRIGHT        reduce using rule 60 (component -> IDENTIFIER .)
+    SUMDOUBLE       shift and go to state 36
+    MINUSDOUBLE     shift and go to state 37
+
+
+state 49
+
+    (61) component -> facts .
+
+    POW             reduce using rule 61 (component -> facts .)
+    TIMES           reduce using rule 61 (component -> facts .)
+    DIVISION        reduce using rule 61 (component -> facts .)
+    MODULE          reduce using rule 61 (component -> facts .)
+    EQUALS          reduce using rule 61 (component -> facts .)
+    NOTEQUAL        reduce using rule 61 (component -> facts .)
+    LESS            reduce using rule 61 (component -> facts .)
+    LESSEQUAL       reduce using rule 61 (component -> facts .)
+    GREAT           reduce using rule 61 (component -> facts .)
+    GREATEQUAL      reduce using rule 61 (component -> facts .)
+    AND             reduce using rule 61 (component -> facts .)
+    OR              reduce using rule 61 (component -> facts .)
+    SUM             reduce using rule 61 (component -> facts .)
+    MINUS           reduce using rule 61 (component -> facts .)
+    DOTCOMMA        reduce using rule 61 (component -> facts .)
+    PARRIGHT        reduce using rule 61 (component -> facts .)
+
+
+state 50
+
+    (62) component -> doublefacts .
+
+    POW             reduce using rule 62 (component -> doublefacts .)
+    TIMES           reduce using rule 62 (component -> doublefacts .)
+    DIVISION        reduce using rule 62 (component -> doublefacts .)
+    MODULE          reduce using rule 62 (component -> doublefacts .)
+    EQUALS          reduce using rule 62 (component -> doublefacts .)
+    NOTEQUAL        reduce using rule 62 (component -> doublefacts .)
+    LESS            reduce using rule 62 (component -> doublefacts .)
+    LESSEQUAL       reduce using rule 62 (component -> doublefacts .)
+    GREAT           reduce using rule 62 (component -> doublefacts .)
+    GREATEQUAL      reduce using rule 62 (component -> doublefacts .)
+    AND             reduce using rule 62 (component -> doublefacts .)
+    OR              reduce using rule 62 (component -> doublefacts .)
+    SUM             reduce using rule 62 (component -> doublefacts .)
+    MINUS           reduce using rule 62 (component -> doublefacts .)
+    DOTCOMMA        reduce using rule 62 (component -> doublefacts .)
+    PARRIGHT        reduce using rule 62 (component -> doublefacts .)
+
+
+state 51
+
+    (63) facts -> NUMBER .
+
+    POW             reduce using rule 63 (facts -> NUMBER .)
+    TIMES           reduce using rule 63 (facts -> NUMBER .)
+    DIVISION        reduce using rule 63 (facts -> NUMBER .)
+    MODULE          reduce using rule 63 (facts -> NUMBER .)
+    EQUALS          reduce using rule 63 (facts -> NUMBER .)
+    NOTEQUAL        reduce using rule 63 (facts -> NUMBER .)
+    LESS            reduce using rule 63 (facts -> NUMBER .)
+    LESSEQUAL       reduce using rule 63 (facts -> NUMBER .)
+    GREAT           reduce using rule 63 (facts -> NUMBER .)
+    GREATEQUAL      reduce using rule 63 (facts -> NUMBER .)
+    AND             reduce using rule 63 (facts -> NUMBER .)
+    OR              reduce using rule 63 (facts -> NUMBER .)
+    SUM             reduce using rule 63 (facts -> NUMBER .)
+    MINUS           reduce using rule 63 (facts -> NUMBER .)
+    DOTCOMMA        reduce using rule 63 (facts -> NUMBER .)
+    PARRIGHT        reduce using rule 63 (facts -> NUMBER .)
+    DOUBLEDOT       reduce using rule 63 (facts -> NUMBER .)
+
+
+state 52
+
+    (64) facts -> REALNUMBER .
+
+    POW             reduce using rule 64 (facts -> REALNUMBER .)
+    TIMES           reduce using rule 64 (facts -> REALNUMBER .)
+    DIVISION        reduce using rule 64 (facts -> REALNUMBER .)
+    MODULE          reduce using rule 64 (facts -> REALNUMBER .)
+    EQUALS          reduce using rule 64 (facts -> REALNUMBER .)
+    NOTEQUAL        reduce using rule 64 (facts -> REALNUMBER .)
+    LESS            reduce using rule 64 (facts -> REALNUMBER .)
+    LESSEQUAL       reduce using rule 64 (facts -> REALNUMBER .)
+    GREAT           reduce using rule 64 (facts -> REALNUMBER .)
+    GREATEQUAL      reduce using rule 64 (facts -> REALNUMBER .)
+    AND             reduce using rule 64 (facts -> REALNUMBER .)
+    OR              reduce using rule 64 (facts -> REALNUMBER .)
+    SUM             reduce using rule 64 (facts -> REALNUMBER .)
+    MINUS           reduce using rule 64 (facts -> REALNUMBER .)
+    DOTCOMMA        reduce using rule 64 (facts -> REALNUMBER .)
+    PARRIGHT        reduce using rule 64 (facts -> REALNUMBER .)
+    DOUBLEDOT       reduce using rule 64 (facts -> REALNUMBER .)
+
+
+state 53
+
+    (65) facts -> BOOL .
+
+    POW             reduce using rule 65 (facts -> BOOL .)
+    TIMES           reduce using rule 65 (facts -> BOOL .)
+    DIVISION        reduce using rule 65 (facts -> BOOL .)
+    MODULE          reduce using rule 65 (facts -> BOOL .)
+    EQUALS          reduce using rule 65 (facts -> BOOL .)
+    NOTEQUAL        reduce using rule 65 (facts -> BOOL .)
+    LESS            reduce using rule 65 (facts -> BOOL .)
+    LESSEQUAL       reduce using rule 65 (facts -> BOOL .)
+    GREAT           reduce using rule 65 (facts -> BOOL .)
+    GREATEQUAL      reduce using rule 65 (facts -> BOOL .)
+    AND             reduce using rule 65 (facts -> BOOL .)
+    OR              reduce using rule 65 (facts -> BOOL .)
+    SUM             reduce using rule 65 (facts -> BOOL .)
+    MINUS           reduce using rule 65 (facts -> BOOL .)
+    DOTCOMMA        reduce using rule 65 (facts -> BOOL .)
+    PARRIGHT        reduce using rule 65 (facts -> BOOL .)
+    DOUBLEDOT       reduce using rule 65 (facts -> BOOL .)
+
+
+state 54
+
+    (29) switch_statement -> SWITCH PARLEFT . expression PARRIGHT KEYLEFT case_list KEYRIGHT
+    (35) expression -> . simple_expression relation_operator simple_expression
+    (36) expression -> . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    expression                     shift and go to state 86
+    simple_expression              shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 55
+
+    (23) compound_statement -> KEYLEFT statements KEYRIGHT .
+
+    KEYRIGHT        reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    BOOLEAN         reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    INTEGER         reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    DOUBLE          reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    KEYLEFT         reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    IDENTIFIER      reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    IF              reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    WHILE           reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    DO              reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    CIN             reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    COUT            reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    SWITCH          reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    OTHERWISE       reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+    BREAK           reduce using rule 23 (compound_statement -> KEYLEFT statements KEYRIGHT .)
+
+
+state 56
+
+    (13) statements -> statements statement .
+
+    KEYRIGHT        reduce using rule 13 (statements -> statements statement .)
+    KEYLEFT         reduce using rule 13 (statements -> statements statement .)
+    IDENTIFIER      reduce using rule 13 (statements -> statements statement .)
+    IF              reduce using rule 13 (statements -> statements statement .)
+    WHILE           reduce using rule 13 (statements -> statements statement .)
+    DO              reduce using rule 13 (statements -> statements statement .)
+    CIN             reduce using rule 13 (statements -> statements statement .)
+    COUT            reduce using rule 13 (statements -> statements statement .)
+    SWITCH          reduce using rule 13 (statements -> statements statement .)
+    BREAK           reduce using rule 13 (statements -> statements statement .)
+
+
+state 57
+
+    (7) declaration_variable -> type variable DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    BOOLEAN         reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    INTEGER         reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    DOUBLE          reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    KEYLEFT         reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    IDENTIFIER      reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    IF              reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    WHILE           reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    DO              reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    CIN             reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    COUT            reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+    SWITCH          reduce using rule 7 (declaration_variable -> type variable DOTCOMMA .)
+
+
+state 58
+
+    (8) variable -> variable COMMA . IDENTIFIER
+
+    IDENTIFIER      shift and go to state 87
+
+
+state 59
+
+    (24) assign_statement -> IDENTIFIER ASSIGN expression . DOTCOMMA
+
+    DOTCOMMA        shift and go to state 88
+
+
+state 60
+
+    (57) doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    BOOLEAN         reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    INTEGER         reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    DOUBLE          reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    KEYLEFT         reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    IDENTIFIER      reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    IF              reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    WHILE           reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    DO              reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    CIN             reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    COUT            reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    SWITCH          reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    POW             reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    TIMES           reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    DIVISION        reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    MODULE          reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    EQUALS          reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    NOTEQUAL        reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    LESS            reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    LESSEQUAL       reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    GREAT           reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    GREATEQUAL      reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    AND             reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    OR              reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    SUM             reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    MINUS           reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    DOTCOMMA        reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    PARRIGHT        reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+    BREAK           reduce using rule 57 (doublefacts -> IDENTIFIER SUMDOUBLE DOTCOMMA .)
+
+
+state 61
+
+    (58) doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    BOOLEAN         reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    INTEGER         reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    DOUBLE          reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    KEYLEFT         reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    IDENTIFIER      reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    IF              reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    WHILE           reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    DO              reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    CIN             reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    COUT            reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    SWITCH          reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    POW             reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    TIMES           reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    DIVISION        reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    MODULE          reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    EQUALS          reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    NOTEQUAL        reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    LESS            reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    LESSEQUAL       reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    GREAT           reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    GREATEQUAL      reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    AND             reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    OR              reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    SUM             reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    MINUS           reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    DOTCOMMA        reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    PARRIGHT        reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+    BREAK           reduce using rule 58 (doublefacts -> IDENTIFIER MINUSDOUBLE DOTCOMMA .)
+
+
+state 62
+
+    (25) select_statement -> IF PARLEFT expression . PARRIGHT compound_statement
+    (26) select_statement -> IF PARLEFT expression . PARRIGHT compound_statement OTHERWISE compound_statement
+
+    PARRIGHT        shift and go to state 89
+
+
+state 63
+
+    (27) iteration_statement -> WHILE PARLEFT expression . PARRIGHT compound_statement
+
+    PARRIGHT        shift and go to state 90
+
+
+state 64
+
+    (28) iteration_statement -> DO compound_statement WHILE . PARLEFT expression PARRIGHT DOTCOMMA
+
+    PARLEFT         shift and go to state 91
+
+
+state 65
+
+    (33) cin_statement -> CIN IDENTIFIER DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    BOOLEAN         reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    INTEGER         reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    DOUBLE          reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    KEYLEFT         reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    IDENTIFIER      reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    IF              reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    WHILE           reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    DO              reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    CIN             reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    COUT            reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    SWITCH          reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+    BREAK           reduce using rule 33 (cin_statement -> CIN IDENTIFIER DOTCOMMA .)
+
+
+state 66
+
+    (34) cout_statement -> COUT expression DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    BOOLEAN         reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    INTEGER         reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    DOUBLE          reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    KEYLEFT         reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    IDENTIFIER      reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    IF              reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    WHILE           reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    DO              reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    CIN             reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    COUT            reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    SWITCH          reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+    BREAK           reduce using rule 34 (cout_statement -> COUT expression DOTCOMMA .)
+
+
+state 67
+
+    (35) expression -> simple_expression relation_operator . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    simple_expression              shift and go to state 92
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 68
+
+    (45) simple_expression -> simple_expression sum_operator . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    term                           shift and go to state 93
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 69
+
+    (37) relation_operator -> EQUALS .
+
+    PARLEFT         reduce using rule 37 (relation_operator -> EQUALS .)
+    IDENTIFIER      reduce using rule 37 (relation_operator -> EQUALS .)
+    NUMBER          reduce using rule 37 (relation_operator -> EQUALS .)
+    REALNUMBER      reduce using rule 37 (relation_operator -> EQUALS .)
+    BOOL            reduce using rule 37 (relation_operator -> EQUALS .)
+
+
+state 70
+
+    (38) relation_operator -> NOTEQUAL .
+
+    PARLEFT         reduce using rule 38 (relation_operator -> NOTEQUAL .)
+    IDENTIFIER      reduce using rule 38 (relation_operator -> NOTEQUAL .)
+    NUMBER          reduce using rule 38 (relation_operator -> NOTEQUAL .)
+    REALNUMBER      reduce using rule 38 (relation_operator -> NOTEQUAL .)
+    BOOL            reduce using rule 38 (relation_operator -> NOTEQUAL .)
+
+
+state 71
+
+    (39) relation_operator -> LESS .
+
+    PARLEFT         reduce using rule 39 (relation_operator -> LESS .)
+    IDENTIFIER      reduce using rule 39 (relation_operator -> LESS .)
+    NUMBER          reduce using rule 39 (relation_operator -> LESS .)
+    REALNUMBER      reduce using rule 39 (relation_operator -> LESS .)
+    BOOL            reduce using rule 39 (relation_operator -> LESS .)
+
+
+state 72
+
+    (40) relation_operator -> LESSEQUAL .
+
+    PARLEFT         reduce using rule 40 (relation_operator -> LESSEQUAL .)
+    IDENTIFIER      reduce using rule 40 (relation_operator -> LESSEQUAL .)
+    NUMBER          reduce using rule 40 (relation_operator -> LESSEQUAL .)
+    REALNUMBER      reduce using rule 40 (relation_operator -> LESSEQUAL .)
+    BOOL            reduce using rule 40 (relation_operator -> LESSEQUAL .)
+
+
+state 73
+
+    (41) relation_operator -> GREAT .
+
+    PARLEFT         reduce using rule 41 (relation_operator -> GREAT .)
+    IDENTIFIER      reduce using rule 41 (relation_operator -> GREAT .)
+    NUMBER          reduce using rule 41 (relation_operator -> GREAT .)
+    REALNUMBER      reduce using rule 41 (relation_operator -> GREAT .)
+    BOOL            reduce using rule 41 (relation_operator -> GREAT .)
+
+
+state 74
+
+    (42) relation_operator -> GREATEQUAL .
+
+    PARLEFT         reduce using rule 42 (relation_operator -> GREATEQUAL .)
+    IDENTIFIER      reduce using rule 42 (relation_operator -> GREATEQUAL .)
+    NUMBER          reduce using rule 42 (relation_operator -> GREATEQUAL .)
+    REALNUMBER      reduce using rule 42 (relation_operator -> GREATEQUAL .)
+    BOOL            reduce using rule 42 (relation_operator -> GREATEQUAL .)
+
+
+state 75
+
+    (43) relation_operator -> AND .
+
+    PARLEFT         reduce using rule 43 (relation_operator -> AND .)
+    IDENTIFIER      reduce using rule 43 (relation_operator -> AND .)
+    NUMBER          reduce using rule 43 (relation_operator -> AND .)
+    REALNUMBER      reduce using rule 43 (relation_operator -> AND .)
+    BOOL            reduce using rule 43 (relation_operator -> AND .)
+
+
+state 76
+
+    (44) relation_operator -> OR .
+
+    PARLEFT         reduce using rule 44 (relation_operator -> OR .)
+    IDENTIFIER      reduce using rule 44 (relation_operator -> OR .)
+    NUMBER          reduce using rule 44 (relation_operator -> OR .)
+    REALNUMBER      reduce using rule 44 (relation_operator -> OR .)
+    BOOL            reduce using rule 44 (relation_operator -> OR .)
+
+
+state 77
+
+    (47) sum_operator -> SUM .
+
+    PARLEFT         reduce using rule 47 (sum_operator -> SUM .)
+    IDENTIFIER      reduce using rule 47 (sum_operator -> SUM .)
+    NUMBER          reduce using rule 47 (sum_operator -> SUM .)
+    REALNUMBER      reduce using rule 47 (sum_operator -> SUM .)
+    BOOL            reduce using rule 47 (sum_operator -> SUM .)
+
+
+state 78
+
+    (48) sum_operator -> MINUS .
+
+    PARLEFT         reduce using rule 48 (sum_operator -> MINUS .)
+    IDENTIFIER      reduce using rule 48 (sum_operator -> MINUS .)
+    NUMBER          reduce using rule 48 (sum_operator -> MINUS .)
+    REALNUMBER      reduce using rule 48 (sum_operator -> MINUS .)
+    BOOL            reduce using rule 48 (sum_operator -> MINUS .)
+
+
+state 79
+
+    (49) term -> term mult_operator . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    factor                         shift and go to state 94
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 80
+
+    (51) mult_operator -> TIMES .
+
+    PARLEFT         reduce using rule 51 (mult_operator -> TIMES .)
+    IDENTIFIER      reduce using rule 51 (mult_operator -> TIMES .)
+    NUMBER          reduce using rule 51 (mult_operator -> TIMES .)
+    REALNUMBER      reduce using rule 51 (mult_operator -> TIMES .)
+    BOOL            reduce using rule 51 (mult_operator -> TIMES .)
+
+
+state 81
+
+    (52) mult_operator -> DIVISION .
+
+    PARLEFT         reduce using rule 52 (mult_operator -> DIVISION .)
+    IDENTIFIER      reduce using rule 52 (mult_operator -> DIVISION .)
+    NUMBER          reduce using rule 52 (mult_operator -> DIVISION .)
+    REALNUMBER      reduce using rule 52 (mult_operator -> DIVISION .)
+    BOOL            reduce using rule 52 (mult_operator -> DIVISION .)
+
+
+state 82
+
+    (53) mult_operator -> MODULE .
+
+    PARLEFT         reduce using rule 53 (mult_operator -> MODULE .)
+    IDENTIFIER      reduce using rule 53 (mult_operator -> MODULE .)
+    NUMBER          reduce using rule 53 (mult_operator -> MODULE .)
+    REALNUMBER      reduce using rule 53 (mult_operator -> MODULE .)
+    BOOL            reduce using rule 53 (mult_operator -> MODULE .)
+
+
+state 83
+
+    (54) factor -> factor pot_operator . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    component                      shift and go to state 95
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 84
+
+    (56) pot_operator -> POW .
+
+    PARLEFT         reduce using rule 56 (pot_operator -> POW .)
+    IDENTIFIER      reduce using rule 56 (pot_operator -> POW .)
+    NUMBER          reduce using rule 56 (pot_operator -> POW .)
+    REALNUMBER      reduce using rule 56 (pot_operator -> POW .)
+    BOOL            reduce using rule 56 (pot_operator -> POW .)
+
+
+state 85
+
+    (59) component -> PARLEFT expression . PARRIGHT
+
+    PARRIGHT        shift and go to state 96
+
+
+state 86
+
+    (29) switch_statement -> SWITCH PARLEFT expression . PARRIGHT KEYLEFT case_list KEYRIGHT
+
+    PARRIGHT        shift and go to state 97
+
+
+state 87
+
+    (8) variable -> variable COMMA IDENTIFIER .
+
+    DOTCOMMA        reduce using rule 8 (variable -> variable COMMA IDENTIFIER .)
+    COMMA           reduce using rule 8 (variable -> variable COMMA IDENTIFIER .)
+
+
+state 88
+
+    (24) assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    BOOLEAN         reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    INTEGER         reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    DOUBLE          reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    KEYLEFT         reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    IDENTIFIER      reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    IF              reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    WHILE           reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    DO              reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    CIN             reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    COUT            reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    SWITCH          reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+    BREAK           reduce using rule 24 (assign_statement -> IDENTIFIER ASSIGN expression DOTCOMMA .)
+
+
+state 89
+
+    (25) select_statement -> IF PARLEFT expression PARRIGHT . compound_statement
+    (26) select_statement -> IF PARLEFT expression PARRIGHT . compound_statement OTHERWISE compound_statement
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+
+    KEYLEFT         shift and go to state 5
+
+    compound_statement             shift and go to state 98
+
+state 90
+
+    (27) iteration_statement -> WHILE PARLEFT expression PARRIGHT . compound_statement
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+
+    KEYLEFT         shift and go to state 5
+
+    compound_statement             shift and go to state 99
+
+state 91
+
+    (28) iteration_statement -> DO compound_statement WHILE PARLEFT . expression PARRIGHT DOTCOMMA
+    (35) expression -> . simple_expression relation_operator simple_expression
+    (36) expression -> . simple_expression
+    (45) simple_expression -> . simple_expression sum_operator term
+    (46) simple_expression -> . term
+    (49) term -> . term mult_operator factor
+    (50) term -> . factor
+    (54) factor -> . factor pot_operator component
+    (55) factor -> . component
+    (59) component -> . PARLEFT expression PARRIGHT
+    (60) component -> . IDENTIFIER
+    (61) component -> . facts
+    (62) component -> . doublefacts
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    PARLEFT         shift and go to state 47
+    IDENTIFIER      shift and go to state 48
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    expression                     shift and go to state 100
+    simple_expression              shift and go to state 43
+    term                           shift and go to state 44
+    factor                         shift and go to state 45
+    component                      shift and go to state 46
+    facts                          shift and go to state 49
+    doublefacts                    shift and go to state 50
+
+state 92
+
+    (35) expression -> simple_expression relation_operator simple_expression .
+    (45) simple_expression -> simple_expression . sum_operator term
+    (47) sum_operator -> . SUM
+    (48) sum_operator -> . MINUS
+
+    DOTCOMMA        reduce using rule 35 (expression -> simple_expression relation_operator simple_expression .)
+    PARRIGHT        reduce using rule 35 (expression -> simple_expression relation_operator simple_expression .)
+    SUM             shift and go to state 77
+    MINUS           shift and go to state 78
+
+    sum_operator                   shift and go to state 68
+
+state 93
+
+    (45) simple_expression -> simple_expression sum_operator term .
+    (49) term -> term . mult_operator factor
+    (51) mult_operator -> . TIMES
+    (52) mult_operator -> . DIVISION
+    (53) mult_operator -> . MODULE
+
+    EQUALS          reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    NOTEQUAL        reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    LESS            reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    LESSEQUAL       reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    GREAT           reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    GREATEQUAL      reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    AND             reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    OR              reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    SUM             reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    MINUS           reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    DOTCOMMA        reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    PARRIGHT        reduce using rule 45 (simple_expression -> simple_expression sum_operator term .)
+    TIMES           shift and go to state 80
+    DIVISION        shift and go to state 81
+    MODULE          shift and go to state 82
+
+    mult_operator                  shift and go to state 79
+
+state 94
+
+    (49) term -> term mult_operator factor .
+    (54) factor -> factor . pot_operator component
+    (56) pot_operator -> . POW
+
+    TIMES           reduce using rule 49 (term -> term mult_operator factor .)
+    DIVISION        reduce using rule 49 (term -> term mult_operator factor .)
+    MODULE          reduce using rule 49 (term -> term mult_operator factor .)
+    EQUALS          reduce using rule 49 (term -> term mult_operator factor .)
+    NOTEQUAL        reduce using rule 49 (term -> term mult_operator factor .)
+    LESS            reduce using rule 49 (term -> term mult_operator factor .)
+    LESSEQUAL       reduce using rule 49 (term -> term mult_operator factor .)
+    GREAT           reduce using rule 49 (term -> term mult_operator factor .)
+    GREATEQUAL      reduce using rule 49 (term -> term mult_operator factor .)
+    AND             reduce using rule 49 (term -> term mult_operator factor .)
+    OR              reduce using rule 49 (term -> term mult_operator factor .)
+    SUM             reduce using rule 49 (term -> term mult_operator factor .)
+    MINUS           reduce using rule 49 (term -> term mult_operator factor .)
+    DOTCOMMA        reduce using rule 49 (term -> term mult_operator factor .)
+    PARRIGHT        reduce using rule 49 (term -> term mult_operator factor .)
+    POW             shift and go to state 84
+
+    pot_operator                   shift and go to state 83
+
+state 95
+
+    (54) factor -> factor pot_operator component .
+
+    POW             reduce using rule 54 (factor -> factor pot_operator component .)
+    TIMES           reduce using rule 54 (factor -> factor pot_operator component .)
+    DIVISION        reduce using rule 54 (factor -> factor pot_operator component .)
+    MODULE          reduce using rule 54 (factor -> factor pot_operator component .)
+    EQUALS          reduce using rule 54 (factor -> factor pot_operator component .)
+    NOTEQUAL        reduce using rule 54 (factor -> factor pot_operator component .)
+    LESS            reduce using rule 54 (factor -> factor pot_operator component .)
+    LESSEQUAL       reduce using rule 54 (factor -> factor pot_operator component .)
+    GREAT           reduce using rule 54 (factor -> factor pot_operator component .)
+    GREATEQUAL      reduce using rule 54 (factor -> factor pot_operator component .)
+    AND             reduce using rule 54 (factor -> factor pot_operator component .)
+    OR              reduce using rule 54 (factor -> factor pot_operator component .)
+    SUM             reduce using rule 54 (factor -> factor pot_operator component .)
+    MINUS           reduce using rule 54 (factor -> factor pot_operator component .)
+    DOTCOMMA        reduce using rule 54 (factor -> factor pot_operator component .)
+    PARRIGHT        reduce using rule 54 (factor -> factor pot_operator component .)
+
+
+state 96
+
+    (59) component -> PARLEFT expression PARRIGHT .
+
+    POW             reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    TIMES           reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    DIVISION        reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    MODULE          reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    EQUALS          reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    NOTEQUAL        reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    LESS            reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    LESSEQUAL       reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    GREAT           reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    GREATEQUAL      reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    AND             reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    OR              reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    SUM             reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    MINUS           reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    DOTCOMMA        reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+    PARRIGHT        reduce using rule 59 (component -> PARLEFT expression PARRIGHT .)
+
+
+state 97
+
+    (29) switch_statement -> SWITCH PARLEFT expression PARRIGHT . KEYLEFT case_list KEYRIGHT
+
+    KEYLEFT         shift and go to state 101
+
+
+state 98
+
+    (25) select_statement -> IF PARLEFT expression PARRIGHT compound_statement .
+    (26) select_statement -> IF PARLEFT expression PARRIGHT compound_statement . OTHERWISE compound_statement
+
+    KEYRIGHT        reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    BOOLEAN         reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    INTEGER         reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    DOUBLE          reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    KEYLEFT         reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    IDENTIFIER      reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    IF              reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    WHILE           reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    DO              reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    CIN             reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    COUT            reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    SWITCH          reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    BREAK           reduce using rule 25 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement .)
+    OTHERWISE       shift and go to state 102
+
+
+state 99
+
+    (27) iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .
+
+    KEYRIGHT        reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    BOOLEAN         reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    INTEGER         reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    DOUBLE          reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    KEYLEFT         reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    IDENTIFIER      reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    IF              reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    WHILE           reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    DO              reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    CIN             reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    COUT            reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    SWITCH          reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+    BREAK           reduce using rule 27 (iteration_statement -> WHILE PARLEFT expression PARRIGHT compound_statement .)
+
+
+state 100
+
+    (28) iteration_statement -> DO compound_statement WHILE PARLEFT expression . PARRIGHT DOTCOMMA
+
+    PARRIGHT        shift and go to state 103
+
+
+state 101
+
+    (29) switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT . case_list KEYRIGHT
+    (30) case_list -> . case_list case_statement
+    (31) case_list -> . case_statement
+    (32) case_statement -> . CASE facts DOUBLEDOT statements BREAK DOTCOMMA
+
+    CASE            shift and go to state 106
+
+    case_list                      shift and go to state 104
+    case_statement                 shift and go to state 105
+
+state 102
+
+    (26) select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE . compound_statement
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+
+    KEYLEFT         shift and go to state 5
+
+    compound_statement             shift and go to state 107
+
+state 103
+
+    (28) iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT . DOTCOMMA
+
+    DOTCOMMA        shift and go to state 108
+
+
+state 104
+
+    (29) switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list . KEYRIGHT
+    (30) case_list -> case_list . case_statement
+    (32) case_statement -> . CASE facts DOUBLEDOT statements BREAK DOTCOMMA
+
+    KEYRIGHT        shift and go to state 109
+    CASE            shift and go to state 106
+
+    case_statement                 shift and go to state 110
+
+state 105
+
+    (31) case_list -> case_statement .
+
+    KEYRIGHT        reduce using rule 31 (case_list -> case_statement .)
+    CASE            reduce using rule 31 (case_list -> case_statement .)
+
+
+state 106
+
+    (32) case_statement -> CASE . facts DOUBLEDOT statements BREAK DOTCOMMA
+    (63) facts -> . NUMBER
+    (64) facts -> . REALNUMBER
+    (65) facts -> . BOOL
+
+    NUMBER          shift and go to state 51
+    REALNUMBER      shift and go to state 52
+    BOOL            shift and go to state 53
+
+    facts                          shift and go to state 111
+
+state 107
+
+    (26) select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .
+
+    KEYRIGHT        reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    BOOLEAN         reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    INTEGER         reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    DOUBLE          reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    KEYLEFT         reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    IDENTIFIER      reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    IF              reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    WHILE           reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    DO              reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    CIN             reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    COUT            reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    SWITCH          reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+    BREAK           reduce using rule 26 (select_statement -> IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement .)
+
+
+state 108
+
+    (28) iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    BOOLEAN         reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    INTEGER         reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    DOUBLE          reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    KEYLEFT         reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    IDENTIFIER      reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    IF              reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    WHILE           reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    DO              reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    CIN             reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    COUT            reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    SWITCH          reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+    BREAK           reduce using rule 28 (iteration_statement -> DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA .)
+
+
+state 109
+
+    (29) switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .
+
+    KEYRIGHT        reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    BOOLEAN         reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    INTEGER         reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    DOUBLE          reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    KEYLEFT         reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    IDENTIFIER      reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    IF              reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    WHILE           reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    DO              reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    CIN             reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    COUT            reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    SWITCH          reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+    BREAK           reduce using rule 29 (switch_statement -> SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT .)
+
+
+state 110
+
+    (30) case_list -> case_list case_statement .
+
+    KEYRIGHT        reduce using rule 30 (case_list -> case_list case_statement .)
+    CASE            reduce using rule 30 (case_list -> case_list case_statement .)
+
+
+state 111
+
+    (32) case_statement -> CASE facts . DOUBLEDOT statements BREAK DOTCOMMA
+
+    DOUBLEDOT       shift and go to state 112
+
+
+state 112
+
+    (32) case_statement -> CASE facts DOUBLEDOT . statements BREAK DOTCOMMA
+    (13) statements -> . statements statement
+    (14) statements -> . statement
+    (15) statement -> . compound_statement
+    (16) statement -> . assign_statement
+    (17) statement -> . select_statement
+    (18) statement -> . iteration_statement
+    (19) statement -> . cin_statement
+    (20) statement -> . cout_statement
+    (21) statement -> . switch_statement
+    (22) statement -> . doublefacts
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+    (24) assign_statement -> . IDENTIFIER ASSIGN expression DOTCOMMA
+    (25) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement
+    (26) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+    (27) iteration_statement -> . WHILE PARLEFT expression PARRIGHT compound_statement
+    (28) iteration_statement -> . DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+    (33) cin_statement -> . CIN IDENTIFIER DOTCOMMA
+    (34) cout_statement -> . COUT expression DOTCOMMA
+    (29) switch_statement -> . SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    KEYLEFT         shift and go to state 5
+    IDENTIFIER      shift and go to state 22
+    IF              shift and go to state 23
+    WHILE           shift and go to state 24
+    DO              shift and go to state 25
+    CIN             shift and go to state 26
+    COUT            shift and go to state 27
+    SWITCH          shift and go to state 28
+
+    statements                     shift and go to state 113
+    statement                      shift and go to state 30
+    compound_statement             shift and go to state 11
+    assign_statement               shift and go to state 12
+    select_statement               shift and go to state 13
+    iteration_statement            shift and go to state 14
+    cin_statement                  shift and go to state 15
+    cout_statement                 shift and go to state 16
+    switch_statement               shift and go to state 17
+    doublefacts                    shift and go to state 18
+
+state 113
+
+    (32) case_statement -> CASE facts DOUBLEDOT statements . BREAK DOTCOMMA
+    (13) statements -> statements . statement
+    (15) statement -> . compound_statement
+    (16) statement -> . assign_statement
+    (17) statement -> . select_statement
+    (18) statement -> . iteration_statement
+    (19) statement -> . cin_statement
+    (20) statement -> . cout_statement
+    (21) statement -> . switch_statement
+    (22) statement -> . doublefacts
+    (23) compound_statement -> . KEYLEFT statements KEYRIGHT
+    (24) assign_statement -> . IDENTIFIER ASSIGN expression DOTCOMMA
+    (25) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement
+    (26) select_statement -> . IF PARLEFT expression PARRIGHT compound_statement OTHERWISE compound_statement
+    (27) iteration_statement -> . WHILE PARLEFT expression PARRIGHT compound_statement
+    (28) iteration_statement -> . DO compound_statement WHILE PARLEFT expression PARRIGHT DOTCOMMA
+    (33) cin_statement -> . CIN IDENTIFIER DOTCOMMA
+    (34) cout_statement -> . COUT expression DOTCOMMA
+    (29) switch_statement -> . SWITCH PARLEFT expression PARRIGHT KEYLEFT case_list KEYRIGHT
+    (57) doublefacts -> . IDENTIFIER SUMDOUBLE DOTCOMMA
+    (58) doublefacts -> . IDENTIFIER MINUSDOUBLE DOTCOMMA
+
+    BREAK           shift and go to state 114
+    KEYLEFT         shift and go to state 5
+    IDENTIFIER      shift and go to state 22
+    IF              shift and go to state 23
+    WHILE           shift and go to state 24
+    DO              shift and go to state 25
+    CIN             shift and go to state 26
+    COUT            shift and go to state 27
+    SWITCH          shift and go to state 28
+
+    statement                      shift and go to state 56
+    compound_statement             shift and go to state 11
+    assign_statement               shift and go to state 12
+    select_statement               shift and go to state 13
+    iteration_statement            shift and go to state 14
+    cin_statement                  shift and go to state 15
+    cout_statement                 shift and go to state 16
+    switch_statement               shift and go to state 17
+    doublefacts                    shift and go to state 18
+
+state 114
+
+    (32) case_statement -> CASE facts DOUBLEDOT statements BREAK . DOTCOMMA
+
+    DOTCOMMA        shift and go to state 115
+
+
+state 115
+
+    (32) case_statement -> CASE facts DOUBLEDOT statements BREAK DOTCOMMA .
+
+    KEYRIGHT        reduce using rule 32 (case_statement -> CASE facts DOUBLEDOT statements BREAK DOTCOMMA .)
+    CASE            reduce using rule 32 (case_statement -> CASE facts DOUBLEDOT statements BREAK DOTCOMMA .)
+

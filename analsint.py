@@ -2,6 +2,56 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QTreeWidget, QTreeWidgetI
 from anytree import Node, RenderTree
 import ply.lex as lex
 import ply.yacc as yacc
+import hashlib
+
+class Simbolo:
+    def __init__(self, nombre, tipo, valor=None):
+        self.nombre = nombre
+        self.tipo = tipo
+        self.valor = valor
+        self.lineas = []
+
+    def __repr__(self):
+        return f"Simbolo(nombre={self.nombre}, tipo={self.tipo}, valor={self.valor}, lineas={self.lineas})"
+
+class TablaDeSimbolos:
+    def __init__(self):
+        # El diccionario almacenará los símbolos
+        self.tabla = {}
+
+    def agregar_simbolo(self, nombre, tipo, valor=None):
+        if nombre not in self.tabla:
+            self.tabla[nombre] = Simbolo(nombre, tipo, valor)
+
+    def obtener_simbolo(self, nombre):
+        return self.tabla.get(nombre, None)
+
+    def existe_simbolo(self, nombre):
+        return nombre in self.tabla
+
+    def actualizar_valor(self, nombre, valor):
+        if nombre in self.tabla:
+            self.tabla[nombre].valor = valor
+        
+    def actualizar_lineas(self, nombre, linea):
+        if nombre in self.tabla:
+            self.tabla[nombre].lineas.append(linea)
+
+    def mostrar_tabla(self):
+        for nombre, simbolo in self.tabla.items():
+            print(f"{nombre}: {simbolo}")
+
+# Ejemplo de uso de la tabla de símbolos
+tabla_simbolos = TablaDeSimbolos()
+tabla_simbolos_lineas = TablaDeSimbolos()
+
+errorSem = []
+
+compSymb = ['<', '<=', '==', '>', '>=', '!=']
+
+artSymb = ['*', '^', '+', '-', '/', '%']
+
+stNames = ['While', 'If', 'Block', 'DoWhile', 'IfElse', 'Program', 'Main', 'integer', 'VarDecl', 'Variables', 'double', 'Cin', 'Cout', 'Assign']
 
 tokens = (
     'MAIN', 'INTEGER', 'DOUBLE', 'BOOLEAN', 'IDENTIFIER', 'NUMBER', 'REALNUMBER', 'BOOL', 'SUMDOUBLE', 'MINUSDOUBLE', 'SUM', 'MINUS', 'TIMES', 'DIVISION', 'MODULE', 'POW',
@@ -35,7 +85,9 @@ t_COMMA = r','
 t_DOTCOMMA = r';'
 t_DOUBLEDOT = r':'
 
-t_ignore = '\t\n'
+def t_newline(t):
+    r'\n'
+    t.lexer.lineno += 1
 
 def t_MAIN(t):
     r'main'
@@ -111,6 +163,12 @@ def t_OR(t):
 
 def t_IDENTIFIER(t):
     r'[a-zñA-ZÑ_][a-zñA-ZÑ0-9_]*'
+    if tabla_simbolos_lineas.existe_simbolo(t.value):
+        if t.lineno not in tabla_simbolos_lineas.obtener_simbolo(t.value).lineas:
+            tabla_simbolos_lineas.actualizar_lineas(t.value, t.lineno)
+    else:
+        tabla_simbolos_lineas.agregar_simbolo(t.value, None, None)
+        tabla_simbolos_lineas.actualizar_lineas(t.value, t.lineno)
     return t
 
 def t_REALNUMBER(t):
@@ -128,10 +186,6 @@ def t_MULTIPLECOMMENT(t):
 def t_SINGLECOMMENT(t):
     r'\#[^\n]*'
     pass
-
-def t_newline(t):
-    r'\n+'
-    t.lexer.lineno += len(t.value)
 
 def t_error(t):
     t.lexer.skip(1)
@@ -173,7 +227,7 @@ def p_type(p):
     '''type : BOOLEAN
             | INTEGER
             | DOUBLE'''
-    p[0] = Node(p[1])
+    p[0] = Node(p[1], tipo = p[1])
 
 def p_statements(p):
     '''statements : statements statement
@@ -259,7 +313,7 @@ def p_relation_operator(p):
                          | GREATEQUAL
                          | AND
                          | OR'''
-    p[0] = Node(p[1])
+    p[0] = p[1]
 
 def p_simple_expression(p):
     '''simple_expression : simple_expression sum_operator term
@@ -358,11 +412,11 @@ parser = yacc.yacc()
 data = '''
 main {
     integer x,y,z;
-    double a,b,c;
     #suma=45;
     x=32.32;
     x=23;
     y=2+3-1;
+    double a,b,c,x;
     z=y+7;
     y=y+1;
     a=24.0+4-1/3*2+34-1;
@@ -370,6 +424,7 @@ main {
     y=5+3-2*4/7-9;
     z=8/2+15*4;
     y=14.54;
+    y=a+b;
     if(2>3) {
         x=4+66;
         y=a+3;
@@ -386,6 +441,8 @@ main {
     cin x; 
     y++;
     mas=36/7; 
+    double mas;
+    mas=36/7; 
     while(y==5){
         while(y==0){
             cout mas;
@@ -398,6 +455,11 @@ main {
 
 result = parser.parse(data, lexer=lexer)
 
+
+
+def register_error(varia, message):
+    errorSem.append(f'{varia}: {message}')
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -409,7 +471,9 @@ class MainWindow(QMainWindow):
         self.tree_widget.setColumnCount(1)
         self.tree_widget.setHeaderLabels(['AST'])
 
-        self.build_tree(result, None)
+        self.build_everything(result, None)
+
+        tabla_simbolos.mostrar_tabla()
 
         layout = QVBoxLayout()
         layout.addWidget(self.tree_widget)
@@ -418,15 +482,164 @@ class MainWindow(QMainWindow):
         container.setLayout(layout)
         self.setCentralWidget(container)
 
+    def build_everything(self, node, parent_item):
+        if node is None:
+            return
+        self.give_annotations(node)
+        self.give_types(node)
+        self.update_lines()
+        self.assign_values(node)
+        self.build_tree(node, None)
+        for error in errorSem:
+            print(error)
+    
+    def give_annotations(self, node):
+        if(node.name == 'VarDecl'):
+            node.tipo = node.children[0].tipo
+        elif (node.name == 'Variables'):
+            node.tipo = node.parent.tipo
+            #guardar en la tabla de simbolos
+            for child in node.children:
+                if(tabla_simbolos.existe_simbolo(child.name) == False):
+                    child.tipo = node.tipo
+                    tabla_simbolos.agregar_simbolo(child.name, child.tipo, 0)
+                else:
+                    if tabla_simbolos.obtener_simbolo(child.name).tipo != node.tipo:
+                        child.valor = 'Error de Declaracion de Tipo'
+                        register_error(child.name, child.valor)
+                        
+        elif(node.name not in compSymb) and (node.name not in artSymb) and (node.name not in stNames):
+            if(tabla_simbolos.existe_simbolo(node.name) == True):
+                node.tipo = tabla_simbolos.obtener_simbolo(node.name).tipo
+        for child in node.children:
+            self.give_annotations(child)
+
+    def give_types(self, node):
+        for child in node.children:
+            self.give_types(child)
+        try:
+            numero = int(node.name)
+            node.tipo = 'integer'
+            node.valor = numero
+        except ValueError:
+            try:
+                numero = float(node.name)
+                node.tipo = 'double'
+                node.valor = numero
+            except ValueError:
+                for child in node.children:
+                    if child.tipo == 'Error':
+                        node.tipo = 'Error'
+                        node.valor = None
+                        register_error(node.name, 'Error en nodo anterior')
+                        return
+                if node.name in compSymb:
+                    node.tipo = 'boolean'
+                elif node.name in artSymb:
+                    for child in node.children:
+                        if child.tipo == 'double':
+                            node.tipo = 'double'
+                            break
+                        else:
+                            node.tipo = 'integer'
+                elif node.name == 'Assign':
+                    node.tipo = node.children[0].tipo
+
+    def update_lines(self):
+        for nombre, simbolo in tabla_simbolos.tabla.items():
+            if(tabla_simbolos_lineas.obtener_simbolo(nombre)):
+                tabla_simbolos.obtener_simbolo(nombre).lineas = tabla_simbolos_lineas.obtener_simbolo(nombre).lineas
+
+    def assign_values(self, node):
+        for child in node.children:
+            self.assign_values(child)
+        
+        for child in node.children:
+            if child.tipo == 'Error':
+                node.valor = 'Error'
+                register_error(node.name, 'Error en nodo anterior')
+        if node.valor != 'Error' and node.tipo != 'Error':
+            if node.name in compSymb:
+                operator_1 = 0
+                if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
+                    node.children[0].valor = tabla_simbolos.obtener_simbolo(node.children[0].name).valor
+
+                operator_1 = node.children[0].valor
+
+                operator_2 = 0
+                if tabla_simbolos.existe_simbolo(node.children[1].name) == True:
+                    node.children[1].valor = tabla_simbolos.obtener_simbolo(node.children[1].name).valor
+                operator_2 = node.children[1].valor
+
+                if node.name == '<':
+                    node.valor = operator_1 < operator_2
+                if node.name == '<=':
+                    node.valor = operator_1 <= operator_2
+                if node.name == '==':
+                    node.valor = operator_1 == operator_2
+                if node.name == '>=':
+                    node.valor = operator_1 >= operator_2
+                if node.name == '>':
+                    node.valor = operator_1 > operator_2
+                if node.name == '!=':
+                    node.valor = operator_1 != operator_2
+
+            if node.name in artSymb:
+                operator_1 = 0
+                if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
+                    operator_1 = tabla_simbolos.obtener_simbolo(node.children[0].name).valor
+                else:
+                    operator_1 = node.children[0].valor
+
+                operator_2 = 0
+                if tabla_simbolos.existe_simbolo(node.children[1].name) == True:
+                    operator_2 = tabla_simbolos.obtener_simbolo(node.children[1].name).valor
+                else:
+                    operator_2 = node.children[1].valor
+
+                if node.name == '+':
+                    node.valor = operator_1 + operator_2
+                if node.name == '-':
+                    node.valor = operator_1 - operator_2
+                if node.name == '*':
+                    node.valor = operator_1 * operator_2
+                if node.name == '/':
+                    node.valor = operator_1 / operator_2
+                if node.name == '^':
+                    node.valor = operator_1 ** operator_2
+                if node.name == '%':
+                    node.valor = operator_1 % operator_2
+
+                if node.tipo == 'integer':
+                    if node.parent.children[0].tipo == 'integer':
+                        node.valor = round(node.valor)
+                if node.tipo == 'double':
+                    if node.parent.children[0].tipo == 'integer':
+                        node.valor = round(node.valor)
+            if node.name == 'Assign':
+                if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
+                    if(node.children[0].tipo == node.children[1].tipo):
+                        tabla_simbolos.actualizar_valor(node.children[0].name, node.children[1].valor)
+                        node.children[0].valor = node.children[1].valor
+                    elif node.children[0].tipo == 'double':
+                        node.children[0].valor = float(node.children[1].valor)
+                        tabla_simbolos.actualizar_valor(node.children[0].name, node.children[1].valor)
+                    else:
+                        node.children[0].valor = 'Error de asignacion'
+                        register_error(node.children[0].name, 'Error de asignacion')
+                else: 
+                    register_error(node.children[0].name, 'Variable no declarada')
+
+
     def build_tree(self, node, parent_item):
         if node is None:
             return
+        print(node)
         item = QTreeWidgetItem([str(node.name)])
         if parent_item is None:
             self.tree_widget.addTopLevelItem(item)
         else:
             parent_item.addChild(item)
-
         for child in node.children:
             self.build_tree(child, item)
 
