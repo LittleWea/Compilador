@@ -30,6 +30,8 @@
 'b': identificador
 ',': simbolo puntuacion
 'c': identificador
+',': simbolo puntuacion
+'x': identificador
 ';': simbolo puntuacion
 'z': identificador
 '=': simbolo aritmetico
@@ -129,8 +131,6 @@
 '}': simbolo llave
 'otherwise': identificador
 '{': simbolo llave
-'\': error
-'n': identificador
 'y': identificador
 '=': simbolo aritmetico
 'y': identificador
@@ -183,6 +183,15 @@
 ';': simbolo puntuacion
 'y': identificador
 '++': simbolo aritmetico
+';': simbolo puntuacion
+'mas': identificador
+'=': simbolo aritmetico
+'36': numero entero
+'/': simbolo aritmetico
+'7': numero entero
+';': simbolo puntuacion
+'double': palabra reservada
+'mas': identificador
 ';': simbolo puntuacion
 'mas': identificador
 '=': simbolo aritmetico

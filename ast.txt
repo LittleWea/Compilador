@@ -24,7 +24,8 @@ Program
     │   └── Variables
     │       ├── a
     │       ├── b
-    │       └── c
+    │       ├── c
+    │       └── x
     ├── Assign
     │   ├── z
     │   └── +
@@ -106,7 +107,7 @@ Program
     │   │           └── 3
     │   └── Block
     │       └── Assign
-    │           ├── n
+    │           ├── y
     │           └── +
     │               ├── y
     │               └── 1
@@ -147,6 +148,15 @@ Program
     │   └── +
     │       ├── y
     │       └── 1
+    ├── Assign
+    │   ├── mas
+    │   └── /
+    │       ├── 36
+    │       └── 7
+    ├── VarDecl
+    │   ├── double
+    │   └── Variables
+    │       └── mas
     ├── Assign
     │   ├── mas
     │   └── /

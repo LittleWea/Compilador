@@ -14,8 +14,55 @@ from PyQt5.QtCore import QUrl
 from analLexico import lexer, tipoToken, Token
 from analsint import returnres
 
-#from analsint import analisis_sintactico, SyntaxError
 
+class Simbolo:
+    def __init__(self, nombre, tipo, valor=None):
+        self.nombre = nombre
+        self.tipo = tipo
+        self.valor = valor
+        self.lineas = []
+
+    def __repr__(self):
+        return f"Simbolo(nombre={self.nombre}, tipo={self.tipo}, valor={self.valor}, lineas={self.lineas})"
+
+class TablaDeSimbolos:
+    def __init__(self):
+        # El diccionario almacenará los símbolos
+        self.tabla = {}
+
+    def agregar_simbolo(self, nombre, tipo, valor=None):
+        if nombre not in self.tabla:
+            self.tabla[nombre] = Simbolo(nombre, tipo, valor)
+
+    def obtener_simbolo(self, nombre):
+        return self.tabla.get(nombre, None)
+
+    def existe_simbolo(self, nombre):
+        return nombre in self.tabla
+
+    def actualizar_valor(self, nombre, valor):
+        if nombre in self.tabla:
+            self.tabla[nombre].valor = valor
+        
+    def actualizar_lineas(self, nombre, linea):
+        if nombre in self.tabla:
+            self.tabla[nombre].lineas.append(linea)
+
+    def mostrar_tabla(self):
+        for nombre, simbolo in self.tabla.items():
+            print(f"{nombre}: {simbolo}")
+
+# Ejemplo de uso de la tabla de símbolos
+tabla_simbolos = TablaDeSimbolos()
+tabla_simbolos_lineas = TablaDeSimbolos()
+
+errorSem = []
+
+compSymb = ['<', '<=', '==', '>', '>=', '!=']
+
+artSymb = ['*', '^', '+', '-', '/', '%']
+
+stNames = ['While', 'If', 'Block', 'DoWhile', 'IfElse', 'Program', 'Main', 'integer', 'VarDecl', 'Variables', 'double', 'Cin', 'Cout', 'Assign']
 
 file_path_save = os.path.join(os.getcwd(), 'default.cps')
 
@@ -26,6 +73,158 @@ colorsp2 = ['#CE7B91','#B47182']
 class NoScrollTextEdit(QTextEdit):
     def wheelEvent(self, event: QWheelEvent):
         pass  # Ignore wheel events
+
+def build_everything(node, parent_item):
+        if node is None:
+            return
+        give_annotations(node)
+        give_types(node)
+        update_lines()
+        assign_values(node)
+        for error in errorSem:
+            print(error)
+
+def register_error(varia, message):
+    errorSem.append(f'{varia}: {message}')
+
+def give_annotations(node):
+    if(node.name == 'VarDecl'):
+        node.tipo = node.children[0].tipo
+    elif (node.name == 'Variables'):
+        node.tipo = node.parent.tipo
+        #guardar en la tabla de simbolos
+        for child in node.children:
+            if(tabla_simbolos.existe_simbolo(child.name) == False):
+                child.tipo = node.tipo
+                tabla_simbolos.agregar_simbolo(child.name, child.tipo, 0)
+            else:
+                if tabla_simbolos.obtener_simbolo(child.name).tipo != node.tipo:
+                    child.valor = 'Error de Declaracion de Tipo'
+                    register_error(child.name, child.valor)
+                    
+    elif(node.name not in compSymb) and (node.name not in artSymb) and (node.name not in stNames):
+        if(tabla_simbolos.existe_simbolo(node.name) == True):
+            node.tipo = tabla_simbolos.obtener_simbolo(node.name).tipo
+    for child in node.children:
+        give_annotations(child)
+
+def give_types(node):
+    for child in node.children:
+        give_types(child)
+    try:
+        numero = int(node.name)
+        node.tipo = 'integer'
+        node.valor = numero
+    except ValueError:
+        try:
+            numero = float(node.name)
+            node.tipo = 'double'
+            node.valor = numero
+        except ValueError:
+            for child in node.children:
+                if child.tipo == 'Error':
+                    node.tipo = 'Error'
+                    node.valor = None
+                    register_error(node.name, 'Error en nodo anterior')
+                    return
+            if node.name in compSymb:
+                node.tipo = 'boolean'
+            elif node.name in artSymb:
+                for child in node.children:
+                    if child.tipo == 'double':
+                        node.tipo = 'double'
+                        break
+                    else:
+                        node.tipo = 'integer'
+            elif node.name == 'Assign':
+                node.tipo = node.children[0].tipo
+
+def update_lines():
+    for nombre, simbolo in tabla_simbolos.tabla.items():
+        if(tabla_simbolos_lineas.obtener_simbolo(nombre)):
+            tabla_simbolos.obtener_simbolo(nombre).lineas = tabla_simbolos_lineas.obtener_simbolo(nombre).lineas
+
+def assign_values(node):
+    for child in node.children:
+        assign_values(child)
+    
+    for child in node.children:
+        if child.tipo == 'Error':
+            node.valor = 'Error'
+            register_error(node.name, 'Error en nodo anterior')
+    if node.valor != 'Error' and node.tipo != 'Error':
+        if node.name in compSymb:
+            operator_1 = 0
+            if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
+                node.children[0].valor = tabla_simbolos.obtener_simbolo(node.children[0].name).valor
+
+            operator_1 = node.children[0].valor
+
+            operator_2 = 0
+            if tabla_simbolos.existe_simbolo(node.children[1].name) == True:
+                node.children[1].valor = tabla_simbolos.obtener_simbolo(node.children[1].name).valor
+            operator_2 = node.children[1].valor
+
+            if node.name == '<':
+                node.valor = operator_1 < operator_2
+            if node.name == '<=':
+                node.valor = operator_1 <= operator_2
+            if node.name == '==':
+                node.valor = operator_1 == operator_2
+            if node.name == '>=':
+                node.valor = operator_1 >= operator_2
+            if node.name == '>':
+                node.valor = operator_1 > operator_2
+            if node.name == '!=':
+                node.valor = operator_1 != operator_2
+
+        elif node.name in artSymb:
+            operator_1 = 0
+            if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
+                operator_1 = tabla_simbolos.obtener_simbolo(node.children[0].name).valor
+            else:
+                operator_1 = node.children[0].valor
+
+            operator_2 = 0
+            if tabla_simbolos.existe_simbolo(node.children[1].name) == True:
+                operator_2 = tabla_simbolos.obtener_simbolo(node.children[1].name).valor
+            else:
+                operator_2 = node.children[1].valor
+
+            if node.name == '+':
+                node.valor = operator_1 + operator_2
+            if node.name == '-':
+                node.valor = operator_1 - operator_2
+            if node.name == '*':
+                node.valor = operator_1 * operator_2
+            if node.name == '/':
+                node.valor = operator_1 / operator_2
+            if node.name == '^':
+                node.valor = operator_1 ** operator_2
+            if node.name == '%':
+                node.valor = operator_1 % operator_2
+
+            if node.tipo == 'integer':
+                if node.parent.children[0].tipo == 'integer':
+                    node.valor = round(node.valor)
+            if node.tipo == 'double':
+                if node.parent.children[0].tipo == 'integer':
+                    node.valor = round(node.valor)
+        elif node.name == 'Assign':
+            if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
+                if(node.children[0].tipo == node.children[1].tipo):
+                    tabla_simbolos.actualizar_valor(node.children[0].name, node.children[1].valor)
+                    node.children[0].valor = node.children[1].valor
+                elif node.children[0].tipo == 'double':
+                    node.children[0].valor = float(node.children[1].valor)
+                    tabla_simbolos.actualizar_valor(node.children[0].name, node.children[1].valor)
+                else:
+                    node.children[0].valor = 'Error de asignacion'
+                    register_error(node.children[0].name, 'Error de asignacion')
+            else: 
+                register_error(node.children[0].name, 'Variable no declarada')
+        elif tabla_simbolos.existe_simbolo(node.name):
+            node.valor = tabla_simbolos.obtener_simbolo(node.name).valor
 
 # Funcion para manejar el cambio de la seleccion de opciones
 def handle_selection_change(index):
@@ -169,7 +368,16 @@ def sint_anal():
     text = text_box.toPlainText()
     res = returnres(text)
     tree_widget.clear()
+    
+    build_everything(res[1], None)
     build_tree(res[1], None)
+    global tabla_simbolos
+    tabla_simbolos.mostrar_tabla()
+    tabla_simbolos = TablaDeSimbolos()
+    print('---------------------------')
+    
+    global errorSem
+    errorSem =[]
     save_tree_to_file(res[1], "ast.txt")
     save_errors_to_file(res[0], "syntax_errors.txt")
     
