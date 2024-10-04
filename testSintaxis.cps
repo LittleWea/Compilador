@@ -35,7 +35,7 @@ x=6+8/9*8/3;
    
   while(y==5){
  while(y==0){
-    cin mas;
+    cin 1+1;
     cout mas;
     
     
