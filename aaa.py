@@ -95,6 +95,26 @@ def build_everything(node, parent_item):
 def register_error(varia, message):
     errorSem.append(f'{varia}: {message}')
 
+    error_message = f"{varia}: {message}"
+    
+    error_file_path = 'ErroreSem.cps'
+
+    with open('ErroreSem.cps', 'a') as file:
+        file.write(error_message + "\n")
+    
+    # try:
+    #     with open('ErroreSem.cps', 'r') as file:
+    #         errors_content = file.read()
+    #         print("errores "+errors_content+"\n")
+    #         # Mostrar el contenido en la pestaña de errores
+    #         tab_widget_2.widget(0).layout.itemAt(0).widget().setText(errors_content)
+    # except FileNotFoundError:
+    #     # Si el archivo no existe, mostrar un mensaje en la pestaña de errores
+    #     tab_widget_2.widget(0).layout.itemAt(0).widget().setText("No se encontró el archivo de errores.")
+    
+    # with open(error_file_path, 'w') as file:
+    #     pass
+
 def give_annotations(node):
     if(node.name == 'VarDecl'):
         node.tipo = node.children[0].tipo
@@ -378,7 +398,7 @@ def sint_anal():
     tree_widget.clear()
 
     build_everything(res[1], None)
-    build_tree(res[1], None)
+    build_tree(res[1], None,tree_widget, show_details = False)
 
     global tabla_simbolos
     # Mostrar la tabla de símbolos y obtener su contenido
@@ -389,9 +409,7 @@ def sint_anal():
 
     # Guardar la tabla en un archivo
     tabla_simbolos.guardar_tabla_txt("table.cps")
-    tabla_simbolos = TablaDeSimbolos()
-
-    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    tabla_simbolos = TablaDeSimbolos()  
     
     global errorSem
     errorSem = []
@@ -399,20 +417,36 @@ def sint_anal():
     save_tree_to_file(res[1], "ast.txt")
     save_errors_to_file(res[0], "syntax_errors.txt")
 
+    ##Prueba
+    tree_widget_semantico = QTreeWidget()
+    tree_widget_semantico.setColumnCount(1)
+    tree_widget_semantico.setHeaderLabels(['AST Semantico'])
     
+    tab_widget_1.widget(1).layout.addWidget(tree_widget_semantico)
+    build_tree(res[1], None, tree_widget_semantico, show_details=True)
 
-def build_tree(node, parent_item):
+def build_tree(node, parent_item, tree_widget, show_details):
     print(node)
     if node is None:
         return
-    item = QTreeWidgetItem([str(node.name)])
+    
+    if show_details:
+        valor = f" (valor: {node.valor})" if node.valor is not None else ""
+        tipo = f" (tipo: {node.tipo})" if node.tipo is not None else ""
+        item = QTreeWidgetItem([f"{node.name}{tipo}{valor}"])
+    else:
+        # Mostrar solo el nombre del nodo si show_details es False
+        item = QTreeWidgetItem([f"{node.name}"])
+
     if parent_item is None:
         tree_widget.addTopLevelItem(item)
     else:
         parent_item.addChild(item)
+
     item.setExpanded(True)
+    
     for child in node.children:
-        build_tree(child, item)
+        build_tree(child, item,tree_widget, show_details)
 
 def save_tree_to_file(node, file_path):
     with open(file_path, 'w', encoding='utf-8') as file:

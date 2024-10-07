@@ -1,0 +1,6 @@
+x: tipo=integer, valor=9, lineas=[]
+y: tipo=integer, valor=1, lineas=[]
+z: tipo=integer, valor=64, lineas=[]
+a: tipo=double, valor=62.0, lineas=[]
+b: tipo=double, valor=5.0, lineas=[]
+c: tipo=double, valor=-1, lineas=[]
