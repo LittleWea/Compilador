@@ -59,19 +59,7 @@ class TablaDeSimbolos:
         with open(nombre_archivo, 'w') as archivo:
             for nombre, simbolo in self.tabla.items():
                 archivo.write(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}\n")
-   
-    def mostrar_hash(self):
-        global resultado
-        for nombre, simbolo in self.tabla.items():
-            resultado.append(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}")
-        
-    def hash_table():
-        global resultado
-        return resultado
-    
-
-
-
+  
 # Ejemplo de uso de la tabla de símbolos
 tabla_simbolos = TablaDeSimbolos()
 tabla_simbolos_lineas = TablaDeSimbolos()
@@ -407,6 +395,7 @@ def sint_anal():
     
     global errorSem
     errorSem = []
+    
     save_tree_to_file(res[1], "ast.txt")
     save_errors_to_file(res[0], "syntax_errors.txt")
 
