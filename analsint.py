@@ -41,6 +41,15 @@ class TablaDeSimbolos:
         for nombre, simbolo in self.tabla.items():
             print(f"{nombre}: {simbolo}")
 
+    def mostrar_hash(self):
+        data = ""
+        for nombre, simbolo in self.tabla.items():
+            data += f"{nombre}:{simbolo}" 
+        print("a!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(data)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        return data
+
 # Ejemplo de uso de la tabla de símbolos
 tabla_simbolos = TablaDeSimbolos()
 tabla_simbolos_lineas = TablaDeSimbolos()
@@ -660,3 +669,23 @@ def returnres(text):
     total.append(errores)
     total.append(result)
     return total
+
+# def returnsem(self):
+#     # Devolver el resultado de la evaluación, la tabla de símbolos y el árbol semántico
+#     return {
+#         'resultado': result,
+#         'tabla_de_simbolos': tabla_simbolos.tabla,
+#         'arbol_semantico': build_tree_structure(result)
+#     }
+
+# def build_tree_structure(self, node):
+#     """Construye una representación del árbol semántico a partir del nodo dado."""
+#     if node is None:
+#         return None
+#     children = [self.build_tree_structure(child) for child in node.children]
+#     return {
+#         'nombre': node.name,
+#         'tipo': getattr(node, 'tipo', None),
+#         'valor': getattr(node, 'valor', None),
+#         'hijos': children
+#     }

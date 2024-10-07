@@ -49,9 +49,17 @@ class TablaDeSimbolos:
             self.tabla[nombre].lineas.append(linea)
 
     def mostrar_tabla(self):
+        contenido = []
         for nombre, simbolo in self.tabla.items():
-            print(f"{nombre}: {simbolo}")
+            contenido.append(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}")
+        return "\n".join(contenido)
 
+    def guardar_tabla_txt(self, nombre_archivo):
+        """Guarda la tabla de símbolos en un archivo de texto."""
+        with open(nombre_archivo, 'w') as archivo:
+            for nombre, simbolo in self.tabla.items():
+                archivo.write(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}\n")
+  
 # Ejemplo de uso de la tabla de símbolos
 tabla_simbolos = TablaDeSimbolos()
 tabla_simbolos_lineas = TablaDeSimbolos()
@@ -368,18 +376,29 @@ def sint_anal():
     text = text_box.toPlainText()
     res = returnres(text)
     tree_widget.clear()
-    
+
     build_everything(res[1], None)
     build_tree(res[1], None)
+
     global tabla_simbolos
-    tabla_simbolos.mostrar_tabla()
+    # Mostrar la tabla de símbolos y obtener su contenido
+    contenido_tabla = tabla_simbolos.mostrar_tabla()
+    
+    # Actualizar el widget con el contenido de la tabla de símbolos
+    tab_widget_1.widget(3).layout.itemAt(0).widget().setText(contenido_tabla)
+
+    # Guardar la tabla en un archivo
+    tabla_simbolos.guardar_tabla_txt("table.cps")
     tabla_simbolos = TablaDeSimbolos()
-    print('---------------------------')
+
+    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     
     global errorSem
-    errorSem =[]
+    errorSem = []
+    
     save_tree_to_file(res[1], "ast.txt")
     save_errors_to_file(res[0], "syntax_errors.txt")
+
     
 
 def build_tree(node, parent_item):
