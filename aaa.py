@@ -95,6 +95,10 @@ def build_everything(node, parent_item):
 def register_error(varia, message):
     errorSem.append(f'{varia}: {message}')
 
+def obtenerlinea():
+    hola  = " "
+    return hola
+
 def give_annotations(node):
     if(node.name == 'VarDecl'):
         node.tipo = node.children[0].tipo
@@ -132,7 +136,7 @@ def give_types(node):
             for child in node.children:
                 if child.tipo == 'Error':
                     node.tipo = 'Error'
-                    node.valor = None
+                    node.valor = 'Error'
                     register_error(node.name, 'Error en nodo anterior')
                     return
             if node.name in compSymb:
@@ -230,9 +234,22 @@ def assign_values(node):
                     node.children[0].valor = 'Error de asignacion'
                     register_error(node.children[0].name, 'Error de asignacion')
             else: 
+                node.children[0].valor = 'Variable no declarada'
+                node.children[0].tipo = 'Error'
                 register_error(node.children[0].name, 'Variable no declarada')
         elif tabla_simbolos.existe_simbolo(node.name):
             node.valor = tabla_simbolos.obtener_simbolo(node.name).valor
+        
+        else:
+            try:
+                numero = int(node.name)
+            except ValueError:
+                try:
+                    numero = float(node.name)
+                except ValueError:
+                    if node.name not in stNames:
+                        node.tipo = 'Error'
+                        node.valor = 'Variable no encontrada'
 
 # Funcion para manejar el cambio de la seleccion de opciones
 def handle_selection_change(index):
@@ -439,6 +456,11 @@ def lexic_anal():
     # Actualizar los textos en las pestañas correspondientes
     tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text_tokens)
     tab_widget_2.widget(0).layout.itemAt(0).widget().setText(text_errors)
+
+    #Wea Semtantica
+    text_semantic = "Resultados Semanticos"
+    #tabla_simbolos.pasar_tabla()
+    tab_widget_1.widget(1).layout.itemAt(0).widget().setText(text_semantic)
 
 # Funcion para actualizar los numeros de linea
 def update_line_numbers():
