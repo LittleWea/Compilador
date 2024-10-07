@@ -103,9 +103,17 @@
 ';': simbolo puntuacion
 'if': palabra reservada
 '(': simbolo parentesis
-'2': numero entero
+'(': simbolo parentesis
+'4': numero entero
 '>': simbolo logico
-'3': numero entero
+'2': numero entero
+')': simbolo parentesis
+'&&': operador logico
+'(': simbolo parentesis
+'40': numero entero
+'>': simbolo logico
+'50': numero entero
+')': simbolo parentesis
 ')': simbolo parentesis
 '{': simbolo llave
 'y': identificador
@@ -221,7 +229,9 @@
 ')': simbolo parentesis
 '{': simbolo llave
 'cin': palabra reservada
-'mas': identificador
+'1': numero entero
+'+': simbolo aritmetico
+'1': numero entero
 ';': simbolo puntuacion
 'cout': palabra reservada
 'mas': identificador

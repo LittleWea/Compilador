@@ -66,7 +66,7 @@ tabla_simbolos_lineas = TablaDeSimbolos()
 
 errorSem = []
 
-compSymb = ['<', '<=', '==', '>', '>=', '!=']
+compSymb = ['<', '<=', '==', '>', '>=', '!=', '&&', '||']
 
 artSymb = ['*', '^', '+', '-', '/', '%']
 
@@ -97,23 +97,15 @@ def register_error(varia, message):
     
     error_message = f"{varia}: {message}"
     
-    error_file_path = 'ErroreSem.cps'
-
-    with open('ErroreSem.cps', 'a') as file:
+    with open('ErroreSem.txt', 'a') as file:
         file.write(error_message + "\n")
     
-    # try:
-    #     with open('ErroreSem.cps', 'r') as file:
-    #         errors_content = file.read()
-    #         print("errores "+errors_content+"\n")
-    #         # Mostrar el contenido en la pestaña de errores
-    #         tab_widget_2.widget(0).layout.itemAt(0).widget().setText(errors_content)
-    # except FileNotFoundError:
-    #     # Si el archivo no existe, mostrar un mensaje en la pestaña de errores
-    #     tab_widget_2.widget(0).layout.itemAt(0).widget().setText("No se encontró el archivo de errores.")
+def limpia():
+    err = ""
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText("")
+    with open('ErroreSem.txt', 'w', encoding='utf-8') as file:
+         pass    
     
-    # with open(error_file_path, 'w') as file:
-    #     pass
 
 def give_annotations(node):
     if(node.name == 'VarDecl'):
@@ -205,6 +197,10 @@ def assign_values(node):
                 node.valor = operator_1 > operator_2
             if node.name == '!=':
                 node.valor = operator_1 != operator_2
+            if node.name == '&&':
+                node.valor = operator_1 and operator_2
+            if node.name == '||':
+                node.valor = operator_1 or operator_2
 
         elif node.name in artSymb:
             operator_1 = 0
@@ -397,21 +393,26 @@ def save_errors(tokens):
                 file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
 
 def save_errors_to_file(errors, file_path):
-    aux = ''
+
     with open(file_path, 'w', encoding='utf-8') as file:
+        aux = ""
         for error in errors:
             file.write(f"Line {error[0]}: {error[1]}\n")
-            aux += "Line" + str(error[0]) + ":" + error[1] + "\n"
+            aux += "Line" + str(error[0]) + ":" + error[1] + "\n" 
     print(aux)
-    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(aux)
+    errors.clear()
+
     
 def sint_anal():
+    limpia()
     text = text_box.toPlainText()
     res = returnres(text)
     tree_widget.clear()
+    tree_widget_semantico.clear()
 
     build_everything(res[1], None)
     build_tree(res[1], None,tree_widget, show_details = False)
+    build_tree(res[1], None, tree_widget_semantico, show_details=True)
 
     global tabla_simbolos
     # Mostrar la tabla de símbolos y obtener su contenido
@@ -426,17 +427,12 @@ def sint_anal():
     
     global errorSem
     errorSem = []
-    
-    save_tree_to_file(res[1], "ast.txt")
-    save_errors_to_file(res[0], "syntax_errors.txt")
 
-    ##Prueba
-    tree_widget_semantico = QTreeWidget()
-    tree_widget_semantico.setColumnCount(1)
-    tree_widget_semantico.setHeaderLabels(['AST Semantico'])
+    #Errores
+    MostError()
     
-    tab_widget_1.widget(1).layout.addWidget(tree_widget_semantico)
-    build_tree(res[1], None, tree_widget_semantico, show_details=True)
+    save_tree_to_file(res[1], "ast.txt") 
+    save_errors_to_file(res[0], "syntax_errors.txt")
 
 def build_tree(node, parent_item, tree_widget, show_details):
     print(node)
@@ -460,6 +456,26 @@ def build_tree(node, parent_item, tree_widget, show_details):
     
     for child in node.children:
         build_tree(child, item,tree_widget, show_details)
+
+def MostError():
+    aux = ""
+    try:
+        with open('ErroreSem.txt', 'r', encoding='utf-8') as file:
+            aux = "--------------ERRORES SEMANTICOS DETECTADOS :c ------------- \n"
+            aux += file.read()
+    except FileNotFoundError:
+            aux += "ErroreSem.txt no encontrado.\n"
+    
+    # Leer y concatenar el contenido de syntax_errors.txt
+    try:
+        with open('syntax_errors.txt', 'r', encoding='utf-8') as file:
+            aux += "\n--------------ERRORES SINTACTICOS DETECTADOS :c -------------"
+            aux += "\n" + file.read()
+    except FileNotFoundError:
+        aux += "\nsyntax_errors.txt no encontrado."
+
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(aux)
+
 
 def save_tree_to_file(node, file_path):
     with open(file_path, 'w', encoding='utf-8') as file:
@@ -690,6 +706,11 @@ tree_widget = QTreeWidget()
 tree_widget.setColumnCount(1)
 tree_widget.setHeaderLabels(['AST'])
 tab_widget_1.widget(2).layout.addWidget(tree_widget)
+
+tree_widget_semantico = QTreeWidget()
+tree_widget_semantico.setColumnCount(1)
+tree_widget_semantico.setHeaderLabels(['AST Semantico'])
+tab_widget_1.widget(1).layout.addWidget(tree_widget_semantico)
 
 # Mostrar la ventana principal
 window.show()

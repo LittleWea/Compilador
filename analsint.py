@@ -56,7 +56,7 @@ tabla_simbolos_lineas = TablaDeSimbolos()
 
 errorSem = []
 
-compSymb = ['<', '<=', '==', '>', '>=', '!=']
+compSymb = ['<', '<=', '==', '>', '>=', '!=', '&&', '||']
 
 artSymb = ['*', '^', '+', '-', '/', '%']
 
@@ -434,7 +434,7 @@ main {
     z=8/2+15*4;
     y=14.54;
     y=a+b;
-    if(2>3) {
+    if((4>2) || (40>50) ) {
         x=4+66;
         y=a+3;
     }
@@ -592,6 +592,10 @@ class MainWindow(QMainWindow):
                     node.valor = operator_1 > operator_2
                 if node.name == '!=':
                     node.valor = operator_1 != operator_2
+                if node.name == '&&':
+                    node.valor = operator_1 and operator_2
+                if node.name == '||':
+                    node.valor = operator_1 or operator_2
 
             elif node.name in artSymb:
                 operator_1 = 0
