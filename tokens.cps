@@ -7,6 +7,13 @@
 ',': simbolo puntuacion
 'z': identificador
 ';': simbolo puntuacion
+'double': palabra reservada
+'a': identificador
+',': simbolo puntuacion
+'b': identificador
+',': simbolo puntuacion
+'c': identificador
+';': simbolo puntuacion
 '#suma=45;': comentario
 'x': identificador
 '=': simbolo aritmetico
@@ -23,15 +30,6 @@
 '3': numero entero
 '-': simbolo aritmetico
 '1': numero entero
-';': simbolo puntuacion
-'double': palabra reservada
-'a': identificador
-',': simbolo puntuacion
-'b': identificador
-',': simbolo puntuacion
-'c': identificador
-',': simbolo puntuacion
-'x': identificador
 ';': simbolo puntuacion
 'z': identificador
 '=': simbolo aritmetico
@@ -103,12 +101,6 @@
 '=': simbolo aritmetico
 '14.54': numero real
 ';': simbolo puntuacion
-'y': identificador
-'=': simbolo aritmetico
-'a': identificador
-'+': simbolo aritmetico
-'b': identificador
-';': simbolo puntuacion
 'if': palabra reservada
 '(': simbolo parentesis
 '2': numero entero
@@ -116,12 +108,6 @@
 '3': numero entero
 ')': simbolo parentesis
 '{': simbolo llave
-'x': identificador
-'=': simbolo aritmetico
-'4': numero entero
-'+': simbolo aritmetico
-'66': numero entero
-';': simbolo puntuacion
 'y': identificador
 '=': simbolo aritmetico
 'a': identificador
@@ -131,6 +117,33 @@
 '}': simbolo llave
 'otherwise': identificador
 '{': simbolo llave
+'if': palabra reservada
+'(': simbolo parentesis
+'(': simbolo parentesis
+'4': numero entero
+'>': simbolo logico
+'2': numero entero
+')': simbolo parentesis
+'&&': operador logico
+'(': simbolo parentesis
+'40': numero entero
+'>': simbolo logico
+'50': numero entero
+')': simbolo parentesis
+')': simbolo parentesis
+'{': simbolo llave
+'b': identificador
+'=': simbolo aritmetico
+'3.2': numero real
+';': simbolo puntuacion
+'}': simbolo llave
+'otherwise': identificador
+'{': simbolo llave
+'b': identificador
+'=': simbolo aritmetico
+'5.0': numero real
+';': simbolo puntuacion
+'}': simbolo llave
 'y': identificador
 '=': simbolo aritmetico
 'y': identificador
@@ -138,6 +151,12 @@
 '1': numero entero
 ';': simbolo puntuacion
 '}': simbolo llave
+'a': identificador
+'++': simbolo aritmetico
+';': simbolo puntuacion
+'c': identificador
+'--': simbolo aritmetico
+';': simbolo puntuacion
 'x': identificador
 '=': simbolo aritmetico
 '3': numero entero
@@ -181,18 +200,6 @@
 'cin': palabra reservada
 'x': identificador
 ';': simbolo puntuacion
-'y': identificador
-'++': simbolo aritmetico
-';': simbolo puntuacion
-'mas': identificador
-'=': simbolo aritmetico
-'36': numero entero
-'/': simbolo aritmetico
-'7': numero entero
-';': simbolo puntuacion
-'double': palabra reservada
-'mas': identificador
-';': simbolo puntuacion
 'mas': identificador
 '=': simbolo aritmetico
 '36': numero entero
@@ -213,10 +220,10 @@
 '0': numero entero
 ')': simbolo parentesis
 '{': simbolo llave
-'cout': palabra reservada
+'cin': palabra reservada
 'mas': identificador
 ';': simbolo puntuacion
-'cin': palabra reservada
+'cout': palabra reservada
 'mas': identificador
 ';': simbolo puntuacion
 '}': simbolo llave
