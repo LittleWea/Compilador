@@ -15,6 +15,7 @@ class Simbolo:
         return f"Simbolo(nombre={self.nombre}, tipo={self.tipo}, valor={self.valor}, lineas={self.lineas})"
 
 class TablaDeSimbolos:
+    texto=""
     def __init__(self):
         # El diccionario almacenará los símbolos
         self.tabla = {}
@@ -35,20 +36,48 @@ class TablaDeSimbolos:
         
     def actualizar_lineas(self, nombre, linea):
         if nombre in self.tabla:
-            self.tabla[nombre].lineas.append(linea)
+            simbolo = self.tabla[nombre]
+            if linea is not None:
+                simbolo.lineas.append(linea)
+            else:
+                print(f"Advertencia: línea no válida para el símbolo {nombre}")
+    
+    def lin_ret(self, nombre, linea):
+        if nombre in self.tabla:
+            simbolo = self.tabla[nombre]
+            if linea is not None:
+                simbolo.lineas.append(linea)
+            else:
+                print(f"Advertencia: línea no válida para el símbolo {nombre}")
+        return simbolo
 
     def mostrar_tabla(self):
         for nombre, simbolo in self.tabla.items():
             print(f"{nombre}: {simbolo}")
+            text = f"{nombre}: {simbolo}" + "\n"
+            with open("fin.txt", 'a') as file:
+                file.write(text)
+            #print("")
 
     def mostrar_hash(self):
         data = ""
+        #print("CALEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEB")
         for nombre, simbolo in self.tabla.items():
-            data += f"{nombre}:{simbolo}" 
-        print("a!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        print(data)
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            data += f"{nombre}:{simbolo}"
+            TablaDeSimbolos.texto+=f"{nombre}: {simbolo}"
+        #print("a!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        #print(data)
+        #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return data
+    
+    def refrescar(self):
+        """Refresca la tabla de símbolos, vaciando su contenido."""
+        self.tabla.clear()
+        #print("La tabla de símbolos ha sido refrescada.")
+    def almacenar(self):
+        """Almacena la tabla de símbolos como un diccionario."""
+        simbolos_almacenados = {nombre: {'tipo': simbolo.tipo, 'valor': simbolo.valor} for nombre, simbolo in self.tabla.items()}
+        return simbolos_almacenados
 
 # Ejemplo de uso de la tabla de símbolos
 tabla_simbolos = TablaDeSimbolos()
@@ -172,13 +201,26 @@ def t_OR(t):
 
 def t_IDENTIFIER(t):
     r'[a-zñA-ZÑ_][a-zñA-ZÑ0-9_]*'
+    
+    # Verificar si el símbolo ya existe en la tabla
     if tabla_simbolos_lineas.existe_simbolo(t.value):
-        if t.lineno not in tabla_simbolos_lineas.obtener_simbolo(t.value).lineas:
+        simbolo = tabla_simbolos_lineas.obtener_simbolo(t.value)
+        
+        # Si la línea actual no está en la lista de líneas, agregarla
+        if t.lineno not in simbolo.lineas:
             tabla_simbolos_lineas.actualizar_lineas(t.value, t.lineno)
+            #print(f"Línea {t.lineno} agregada a símbolo '{t.value}'")
+        else:
+            print("")
+            #print(f"Línea {t.lineno} ya registrada para símbolo '{t.value}'")
     else:
+        # Agregar el símbolo si no existe
         tabla_simbolos_lineas.agregar_simbolo(t.value, None, None)
         tabla_simbolos_lineas.actualizar_lineas(t.value, t.lineno)
+        #print(f"Símbolo '{t.value}' agregado y línea {t.lineno} registrada")
+    
     return t
+
 
 def t_REALNUMBER(t):
     r'\d+\.\d+'
@@ -404,13 +446,13 @@ def p_error(p):
     if p:
         error_msg = f'Unexpected token: {p.value}'
         line = p.lineno
-        print("Syntax error at token", p.type, line)
+        ##print("Syntax error at token", p.type, line)
          # Just discard the token and tell the parser it's okay.
         parser.errok()
     else:
         error_msg = 'Unexpected end of input'
         line = 'EOF'
-        print("Syntax error at EOF")
+        ##print("Syntax error at EOF")
     errors.append((line, error_msg)) 
     #save_errors_to_file(errors, "syntax_errors.txt")
    
@@ -475,13 +517,14 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle('AST Viewer')
         self.setGeometry(100, 100, 800, 600)
-
+ 
         self.tree_widget = QTreeWidget()
         self.tree_widget.setColumnCount(1)
         self.tree_widget.setHeaderLabels(['AST'])
 
         self.build_everything(result, None)
-
+        # Refrescar la tabla de símbolos
+        
         tabla_simbolos.mostrar_tabla()
 
         layout = QVBoxLayout()
@@ -500,7 +543,8 @@ class MainWindow(QMainWindow):
         self.assign_values(node)
         self.build_tree(node, None)
         for error in errorSem:
-            print(error)
+            print("")
+            #print(error)
     
     def give_annotations(self, node):
         if(node.name == 'VarDecl'):
@@ -649,7 +693,7 @@ class MainWindow(QMainWindow):
     def build_tree(self, node, parent_item):
         if node is None:
             return
-        print(node)
+        ##print(node)
         item = QTreeWidgetItem([str(node.name)])
         if parent_item is None:
             self.tree_widget.addTopLevelItem(item)
@@ -674,22 +718,15 @@ def returnres(text):
     total.append(result)
     return total
 
-# def returnsem(self):
-#     # Devolver el resultado de la evaluación, la tabla de símbolos y el árbol semántico
-#     return {
-#         'resultado': result,
-#         'tabla_de_simbolos': tabla_simbolos.tabla,
-#         'arbol_semantico': build_tree_structure(result)
-#     }
+def returnlineas(text):
+    global tabla_simbolos_lineas
+    aux = tabla_simbolos_lineas
+    print("cartera")
+    tabla_simbolos_lineas = TablaDeSimbolos()
+    lineas_fin = parser.parse(text, lexer=lexer)
+    
+    return aux
+    
 
-# def build_tree_structure(self, node):
-#     """Construye una representación del árbol semántico a partir del nodo dado."""
-#     if node is None:
-#         return None
-#     children = [self.build_tree_structure(child) for child in node.children]
-#     return {
-#         'nombre': node.name,
-#         'tipo': getattr(node, 'tipo', None),
-#         'valor': getattr(node, 'valor', None),
-#         'hijos': children
-#     }
+
+

@@ -12,27 +12,35 @@ from anytree.exporter import DotExporter
 from PyQt5.QtMultimedia import QSound
 from PyQt5.QtCore import QUrl
 from analLexico import lexer, tipoToken, Token
-from analsint import returnres
+from analsint import returnres, returnlineas
+from analsint import TablaDeSimbolos as hash_table_sint
 
 
 class Simbolo:
-    def __init__(self, nombre, tipo, valor=None):
+    def __init__(self, nombre, tipo, valor=None, loc=0):
         self.nombre = nombre
         self.tipo = tipo
         self.valor = valor
+        self.loc = loc 
         self.lineas = []
 
     def __repr__(self):
-        return f"Simbolo(nombre={self.nombre}, tipo={self.tipo}, valor={self.valor}, lineas={self.lineas})"
+        return f"Simbolo(nombre={self.nombre}, tipo={self.tipo}, valor={self.valor}, loc={self.loc}, lineas={self.lineas})"
 
 class TablaDeSimbolos:
     def __init__(self):
-        # El diccionario almacenará los símbolos
         self.tabla = {}
+        self.loc_counter = 1  # Contador para el número de registro
 
     def agregar_simbolo(self, nombre, tipo, valor=None):
         if nombre not in self.tabla:
-            self.tabla[nombre] = Simbolo(nombre, tipo, valor)
+            simbolo = Simbolo(nombre, tipo, valor, self.loc_counter)
+            self.tabla[nombre] = simbolo
+            self.loc_counter += 1 
+            print(simbolo)
+             # Incrementar el contador de registros
+        else:
+            print(f"El símbolo '{nombre}' ya existe en la tabla.")
 
     def obtener_simbolo(self, nombre):
         return self.tabla.get(nombre, None)
@@ -46,24 +54,41 @@ class TablaDeSimbolos:
         
     def actualizar_lineas(self, nombre, linea):
         if nombre in self.tabla:
-            self.tabla[nombre].lineas.append(linea)
+            simbolo = self.tabla[nombre]
 
+            if linea is not None:
+                simbolo.lineas.append(linea)
+                
+            else:
+                print(f"Advertencia: línea no válida para el símbolo {nombre}")
+
+    def almacenar(self):
+    #     """Almacena la tabla de símbolos como un diccionario."""
+        simbolos_almacenados = {nombre: {'tipo': simbolo.tipo, 'valor': simbolo.valor, 'linea': simbolo.linea} for nombre, simbolo in self.tabla.items()}
+        return simbolos_almacenados
+    
     def mostrar_tabla(self):
         contenido = []
         for nombre, simbolo in self.tabla.items():
-            contenido.append(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}")
+            contenido.append(f"{nombre}: {simbolo} " )
+        print(contenido)
         return "\n".join(contenido)
+        
 
     def guardar_tabla_txt(self, nombre_archivo):
         """Guarda la tabla de símbolos en un archivo de texto."""
         with open(nombre_archivo, 'w') as archivo:
             for nombre, simbolo in self.tabla.items():
-                archivo.write(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}\n")
-  
+
+                archivo.write(f"{nombre}: {simbolo} \n")
+    
+
+    
+    
 # Ejemplo de uso de la tabla de símbolos
 tabla_simbolos = TablaDeSimbolos()
 tabla_simbolos_lineas = TablaDeSimbolos()
-
+lin = TablaDeSimbolos()
 errorSem = []
 
 compSymb = ['<', '<=', '==', '>', '>=', '!=', '&&', '||']
@@ -127,6 +152,9 @@ def give_annotations(node):
             node.tipo = tabla_simbolos.obtener_simbolo(node.name).tipo
     for child in node.children:
         give_annotations(child)
+                    
+    # Verificar si ya existe en la tabla para actualizar líneas si es necesario
+
 
 def give_types(node):
     for child in node.children:
@@ -160,9 +188,14 @@ def give_types(node):
                 node.tipo = node.children[0].tipo
 
 def update_lines():
+    global lin
+    text = text_box.toPlainText()
+    lin = returnlineas(text)
+    #lin.mostrar_tabla()
     for nombre, simbolo in tabla_simbolos.tabla.items():
-        if(tabla_simbolos_lineas.obtener_simbolo(nombre)):
-            tabla_simbolos.obtener_simbolo(nombre).lineas = tabla_simbolos_lineas.obtener_simbolo(nombre).lineas
+        if(lin.obtener_simbolo(nombre)):
+            tabla_simbolos.obtener_simbolo(nombre).lineas = lin.obtener_simbolo(nombre).lineas
+    tabla_simbolos.mostrar_tabla()
 
 def assign_values(node):
     for child in node.children:
@@ -407,6 +440,7 @@ def sint_anal():
     limpia()
     text = text_box.toPlainText()
     res = returnres(text)
+        
     tree_widget.clear()
     tree_widget_semantico.clear()
 
@@ -415,22 +449,19 @@ def sint_anal():
     build_tree(res[1], None, tree_widget_semantico, show_details=True)
 
     global tabla_simbolos
-    # Mostrar la tabla de símbolos y obtener su contenido
-    contenido_tabla = tabla_simbolos.mostrar_tabla()
-    
-    # Actualizar el widget con el contenido de la tabla de símbolos
-    tab_widget_1.widget(3).layout.itemAt(0).widget().setText(contenido_tabla)
 
     # Guardar la tabla en un archivo
+    tabla_del_sint = hash_table_sint()
+    tabla_del_sint.mostrar_hash()
+
+    aux = tabla_simbolos.mostrar_tabla()
+    tab_widget_1.widget(3).layout.itemAt(0).widget().setText(aux)
+
     tabla_simbolos.guardar_tabla_txt("table.cps")
-    tabla_simbolos = TablaDeSimbolos()  
-    
+
     global errorSem
     errorSem = []
 
-    #Errores
-    MostError()
-    
     save_tree_to_file(res[1], "ast.txt") 
     save_errors_to_file(res[0], "syntax_errors.txt")
 
