@@ -436,7 +436,7 @@ def save_errors_to_file(errors, file_path):
     print(aux)
     errors.clear()
 
-    
+   
 def sint_anal():
     limpia()
     text = text_box.toPlainText()
@@ -459,7 +459,7 @@ def sint_anal():
     tab_widget_1.widget(3).layout.itemAt(0).widget().setText(aux)
 
     tabla_simbolos.guardar_tabla_txt("table.cps")
-
+    MostError()
     global errorSem
     errorSem = []
 
