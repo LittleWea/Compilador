@@ -79,11 +79,8 @@ class TablaDeSimbolos:
         """Guarda la tabla de símbolos en un archivo de texto."""
         with open(nombre_archivo, 'w') as archivo:
             for nombre, simbolo in self.tabla.items():
+
                 archivo.write(f"{nombre}: {simbolo} \n")
-    def refrescar(self):
-        """Refresca la tabla de símbolos, vaciando su contenido."""
-        self.tabla.clear()
-        print("La tabla de símbolos ha sido refrescada.")
     
 
     
@@ -94,7 +91,7 @@ tabla_simbolos_lineas = TablaDeSimbolos()
 lin = TablaDeSimbolos()
 errorSem = []
 
-compSymb = ['<', '<=', '==', '>', '>=', '!=']
+compSymb = ['<', '<=', '==', '>', '>=', '!=', '&&', '||']
 
 artSymb = ['*', '^', '+', '-', '/', '%']
 
@@ -122,6 +119,18 @@ def build_everything(node, parent_item):
 
 def register_error(varia, message):
     errorSem.append(f'{varia}: {message}')
+    
+    error_message = f"{varia}: {message}"
+    
+    with open('ErroreSem.txt', 'a') as file:
+        file.write(error_message + "\n")
+    
+def limpia():
+    err = ""
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText("")
+    with open('ErroreSem.txt', 'w', encoding='utf-8') as file:
+         pass    
+    
 
 def give_annotations(node):
     if(node.name == 'VarDecl'):
@@ -163,7 +172,7 @@ def give_types(node):
             for child in node.children:
                 if child.tipo == 'Error':
                     node.tipo = 'Error'
-                    node.valor = None
+                    node.valor = 'Error'
                     register_error(node.name, 'Error en nodo anterior')
                     return
             if node.name in compSymb:
@@ -221,6 +230,10 @@ def assign_values(node):
                 node.valor = operator_1 > operator_2
             if node.name == '!=':
                 node.valor = operator_1 != operator_2
+            if node.name == '&&':
+                node.valor = operator_1 and operator_2
+            if node.name == '||':
+                node.valor = operator_1 or operator_2
 
         elif node.name in artSymb:
             operator_1 = 0
@@ -413,22 +426,27 @@ def save_errors(tokens):
                 file.write(f"'{token[0]}': error en columna {token[2]}, fila {token[1]}\n")
 
 def save_errors_to_file(errors, file_path):
-    aux = ''
+
     with open(file_path, 'w', encoding='utf-8') as file:
+        aux = ""
         for error in errors:
             file.write(f"Line {error[0]}: {error[1]}\n")
-            aux += "Line" + str(error[0]) + ":" + error[1] + "\n"
+            aux += "Line" + str(error[0]) + ":" + error[1] + "\n" 
     print(aux)
-    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(aux)
+    errors.clear()
+
     
 def sint_anal():
+    limpia()
     text = text_box.toPlainText()
     res = returnres(text)
         
     tree_widget.clear()
+    tree_widget_semantico.clear()
 
     build_everything(res[1], None)
-    build_tree(res[1], None)
+    build_tree(res[1], None,tree_widget, show_details = False)
+    build_tree(res[1], None, tree_widget_semantico, show_details=True)
 
     global tabla_simbolos
 
@@ -438,43 +456,57 @@ def sint_anal():
 
     aux = tabla_simbolos.mostrar_tabla()
     tab_widget_1.widget(3).layout.itemAt(0).widget().setText(aux)
-    #print(tabla_del_sint.texto)
-    #contenido = tabla_del_sint.texto
-    #print("------------------------------------------")
-    
+
     tabla_simbolos.guardar_tabla_txt("table.cps")
 
-    tabla_simbolos = TablaDeSimbolos()
-
-    
-    
     global errorSem
     errorSem = []
-    
-    #Lineas
-    #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    # lin = TablaDeSimbolos()
-    # lin = returnlineas(text)
-    # lin.mostrar_tabla()
 
-    save_tree_to_file(res[1], "ast.txt")
+    save_tree_to_file(res[1], "ast.txt") 
     save_errors_to_file(res[0], "syntax_errors.txt")
-    
 
-    
-
-def build_tree(node, parent_item):
+def build_tree(node, parent_item, tree_widget, show_details):
     print(node)
     if node is None:
         return
-    item = QTreeWidgetItem([str(node.name)])
+    
+    if show_details:
+        valor = f" (valor: {node.valor})" if node.valor is not None else ""
+        tipo = f" (tipo: {node.tipo})" if node.tipo is not None else ""
+        item = QTreeWidgetItem([f"{node.name}{tipo}{valor}"])
+    else:
+        # Mostrar solo el nombre del nodo si show_details es False
+        item = QTreeWidgetItem([f"{node.name}"])
+
     if parent_item is None:
         tree_widget.addTopLevelItem(item)
     else:
         parent_item.addChild(item)
+
     item.setExpanded(True)
+    
     for child in node.children:
-        build_tree(child, item)
+        build_tree(child, item,tree_widget, show_details)
+
+def MostError():
+    aux = ""
+    try:
+        with open('ErroreSem.txt', 'r', encoding='utf-8') as file:
+            aux = "--------------ERRORES SEMANTICOS DETECTADOS :c ------------- \n"
+            aux += file.read()
+    except FileNotFoundError:
+            aux += "ErroreSem.txt no encontrado.\n"
+    
+    # Leer y concatenar el contenido de syntax_errors.txt
+    try:
+        with open('syntax_errors.txt', 'r', encoding='utf-8') as file:
+            aux += "\n--------------ERRORES SINTACTICOS DETECTADOS :c -------------"
+            aux += "\n" + file.read()
+    except FileNotFoundError:
+        aux += "\nsyntax_errors.txt no encontrado."
+
+    tab_widget_2.widget(0).layout.itemAt(0).widget().setText(aux)
+
 
 def save_tree_to_file(node, file_path):
     with open(file_path, 'w', encoding='utf-8') as file:
@@ -501,6 +533,11 @@ def lexic_anal():
     # Actualizar los textos en las pestañas correspondientes
     tab_widget_1.widget(0).layout.itemAt(0).widget().setText(text_tokens)
     tab_widget_2.widget(0).layout.itemAt(0).widget().setText(text_errors)
+
+    #Wea Semtantica
+    text_semantic = "Resultados Semanticos"
+    #tabla_simbolos.pasar_tabla()
+    tab_widget_1.widget(1).layout.itemAt(0).widget().setText(text_semantic)
 
 # Funcion para actualizar los numeros de linea
 def update_line_numbers():
@@ -700,6 +737,11 @@ tree_widget = QTreeWidget()
 tree_widget.setColumnCount(1)
 tree_widget.setHeaderLabels(['AST'])
 tab_widget_1.widget(2).layout.addWidget(tree_widget)
+
+tree_widget_semantico = QTreeWidget()
+tree_widget_semantico.setColumnCount(1)
+tree_widget_semantico.setHeaderLabels(['AST Semantico'])
+tab_widget_1.widget(1).layout.addWidget(tree_widget_semantico)
 
 # Mostrar la ventana principal
 window.show()

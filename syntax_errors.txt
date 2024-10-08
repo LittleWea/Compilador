@@ -1,1 +1,5 @@
-Line 63: Unexpected token: y
+Line 2331: Unexpected token: 1
+Line 2331: Unexpected token: +
+Line 2331: Unexpected token: 1
+Line 2331: Unexpected token: ;
+Line 2332: Unexpected token: cout

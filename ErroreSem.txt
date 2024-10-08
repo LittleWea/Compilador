@@ -1,0 +1,5 @@
+x: Error de asignacion
+y: Error de asignacion
+y: Error de asignacion
+Assign: Error en nodo anterior
+Cin: Error en nodo anterior

@@ -85,7 +85,7 @@ tabla_simbolos_lineas = TablaDeSimbolos()
 
 errorSem = []
 
-compSymb = ['<', '<=', '==', '>', '>=', '!=']
+compSymb = ['<', '<=', '==', '>', '>=', '!=', '&&', '||']
 
 artSymb = ['*', '^', '+', '-', '/', '%']
 
@@ -476,7 +476,7 @@ main {
     z=8/2+15*4;
     y=14.54;
     y=a+b;
-    if(2>3) {
+    if((4>2) || (40>50) ) {
         x=4+66;
         y=a+3;
     }
@@ -636,8 +636,12 @@ class MainWindow(QMainWindow):
                     node.valor = operator_1 > operator_2
                 if node.name == '!=':
                     node.valor = operator_1 != operator_2
+                if node.name == '&&':
+                    node.valor = operator_1 and operator_2
+                if node.name == '||':
+                    node.valor = operator_1 or operator_2
 
-            if node.name in artSymb:
+            elif node.name in artSymb:
                 operator_1 = 0
                 if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
                     operator_1 = tabla_simbolos.obtener_simbolo(node.children[0].name).valor
@@ -669,7 +673,7 @@ class MainWindow(QMainWindow):
                 if node.tipo == 'double':
                     if node.parent.children[0].tipo == 'integer':
                         node.valor = round(node.valor)
-            if node.name == 'Assign':
+            elif node.name == 'Assign':
                 if tabla_simbolos.existe_simbolo(node.children[0].name) == True:
                     if(node.children[0].tipo == node.children[1].tipo):
                         tabla_simbolos.actualizar_valor(node.children[0].name, node.children[1].valor)
@@ -682,6 +686,8 @@ class MainWindow(QMainWindow):
                         register_error(node.children[0].name, 'Error de asignacion')
                 else: 
                     register_error(node.children[0].name, 'Variable no declarada')
+            elif tabla_simbolos.existe_simbolo(node.name):
+                node.valor = tabla_simbolos.obtener_simbolo(node.name).valor
 
 
     def build_tree(self, node, parent_item):
