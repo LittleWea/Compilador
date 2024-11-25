@@ -1,5 +1,7 @@
 x: Error de asignacion
 y: Error de asignacion
 y: Error de asignacion
+mas: Variable no encontrada
 Assign: Error en nodo anterior
+mas: Variable no encontrada
 Cin: Error en nodo anterior

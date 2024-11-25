@@ -15,7 +15,6 @@ class Simbolo:
         return f"Simbolo(nombre={self.nombre}, tipo={self.tipo}, valor={self.valor}, lineas={self.lineas})"
 
 class TablaDeSimbolos:
-    texto=""
     def __init__(self):
         # El diccionario almacenará los símbolos
         self.tabla = {}
@@ -36,48 +35,20 @@ class TablaDeSimbolos:
         
     def actualizar_lineas(self, nombre, linea):
         if nombre in self.tabla:
-            simbolo = self.tabla[nombre]
-            if linea is not None:
-                simbolo.lineas.append(linea)
-            else:
-                print(f"Advertencia: línea no válida para el símbolo {nombre}")
-    
-    def lin_ret(self, nombre, linea):
-        if nombre in self.tabla:
-            simbolo = self.tabla[nombre]
-            if linea is not None:
-                simbolo.lineas.append(linea)
-            else:
-                print(f"Advertencia: línea no válida para el símbolo {nombre}")
-        return simbolo
+            self.tabla[nombre].lineas.append(linea)
 
     def mostrar_tabla(self):
         for nombre, simbolo in self.tabla.items():
             print(f"{nombre}: {simbolo}")
-            text = f"{nombre}: {simbolo}" + "\n"
-            with open("fin.txt", 'a') as file:
-                file.write(text)
-            #print("")
 
     def mostrar_hash(self):
         data = ""
-        #print("CALEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEB")
         for nombre, simbolo in self.tabla.items():
-            data += f"{nombre}:{simbolo}"
-            TablaDeSimbolos.texto+=f"{nombre}: {simbolo}"
-        #print("a!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-        #print(data)
-        #print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+            data += f"{nombre}:{simbolo}" 
+        print("a!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(data)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
         return data
-    
-    def refrescar(self):
-        """Refresca la tabla de símbolos, vaciando su contenido."""
-        self.tabla.clear()
-        #print("La tabla de símbolos ha sido refrescada.")
-    def almacenar(self):
-        """Almacena la tabla de símbolos como un diccionario."""
-        simbolos_almacenados = {nombre: {'tipo': simbolo.tipo, 'valor': simbolo.valor} for nombre, simbolo in self.tabla.items()}
-        return simbolos_almacenados
 
 # Ejemplo de uso de la tabla de símbolos
 tabla_simbolos = TablaDeSimbolos()
@@ -201,26 +172,13 @@ def t_OR(t):
 
 def t_IDENTIFIER(t):
     r'[a-zñA-ZÑ_][a-zñA-ZÑ0-9_]*'
-    
-    # Verificar si el símbolo ya existe en la tabla
+    global tabla_simbolos_lineas
     if tabla_simbolos_lineas.existe_simbolo(t.value):
-        simbolo = tabla_simbolos_lineas.obtener_simbolo(t.value)
-        
-        # Si la línea actual no está en la lista de líneas, agregarla
-        if t.lineno not in simbolo.lineas:
-            tabla_simbolos_lineas.actualizar_lineas(t.value, t.lineno)
-            #print(f"Línea {t.lineno} agregada a símbolo '{t.value}'")
-        else:
-            print("")
-            #print(f"Línea {t.lineno} ya registrada para símbolo '{t.value}'")
+        tabla_simbolos_lineas.actualizar_lineas(t.value, t.lineno)
     else:
-        # Agregar el símbolo si no existe
         tabla_simbolos_lineas.agregar_simbolo(t.value, None, None)
         tabla_simbolos_lineas.actualizar_lineas(t.value, t.lineno)
-        #print(f"Símbolo '{t.value}' agregado y línea {t.lineno} registrada")
-    
     return t
-
 
 def t_REALNUMBER(t):
     r'\d+\.\d+'
@@ -446,13 +404,13 @@ def p_error(p):
     if p:
         error_msg = f'Unexpected token: {p.value}'
         line = p.lineno
-        ##print("Syntax error at token", p.type, line)
+        print("Syntax error at token", p.type, line)
          # Just discard the token and tell the parser it's okay.
         parser.errok()
     else:
         error_msg = 'Unexpected end of input'
         line = 'EOF'
-        ##print("Syntax error at EOF")
+        print("Syntax error at EOF")
     errors.append((line, error_msg)) 
     #save_errors_to_file(errors, "syntax_errors.txt")
    
@@ -511,20 +469,33 @@ result = parser.parse(data, lexer=lexer)
 def register_error(varia, message):
     errorSem.append(f'{varia}: {message}')
 
+def returnreslineas(text):
+    lexer = lex.lex()
+    parser = yacc.yacc()
+    global tabla_simbolos_lineas
+    tabla_simbolos_lineas = TablaDeSimbolos()
+
+    parser.parse(text, lexer=lexer)
+
+    tabla_simbolos_lineas.mostrar_tabla()
+
+    return tabla_simbolos_lineas
+
 class MainWindow(QMainWindow):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
 
         self.setWindowTitle('AST Viewer')
         self.setGeometry(100, 100, 800, 600)
- 
+
         self.tree_widget = QTreeWidget()
         self.tree_widget.setColumnCount(1)
         self.tree_widget.setHeaderLabels(['AST'])
 
         self.build_everything(result, None)
-        # Refrescar la tabla de símbolos
-        
+
+        returnreslineas(data)
+
         tabla_simbolos.mostrar_tabla()
 
         layout = QVBoxLayout()
@@ -543,8 +514,7 @@ class MainWindow(QMainWindow):
         self.assign_values(node)
         self.build_tree(node, None)
         for error in errorSem:
-            print("")
-            #print(error)
+            print(error)
     
     def give_annotations(self, node):
         if(node.name == 'VarDecl'):
@@ -685,6 +655,8 @@ class MainWindow(QMainWindow):
                         node.children[0].valor = 'Error de asignacion'
                         register_error(node.children[0].name, 'Error de asignacion')
                 else: 
+                    node.children[0].valor = 'Variable no declarada'
+                    node.children[0].tipo = 'Error'
                     register_error(node.children[0].name, 'Variable no declarada')
             elif tabla_simbolos.existe_simbolo(node.name):
                 node.valor = tabla_simbolos.obtener_simbolo(node.name).valor
@@ -693,7 +665,7 @@ class MainWindow(QMainWindow):
     def build_tree(self, node, parent_item):
         if node is None:
             return
-        ##print(node)
+        print(node)
         item = QTreeWidgetItem([str(node.name)])
         if parent_item is None:
             self.tree_widget.addTopLevelItem(item)
@@ -717,16 +689,6 @@ def returnres(text):
     total.append(errores)
     total.append(result)
     return total
-
-def returnlineas(text):
-    global tabla_simbolos_lineas
-    aux = tabla_simbolos_lineas
-    print("cartera")
-    tabla_simbolos_lineas = TablaDeSimbolos()
-    lineas_fin = parser.parse(text, lexer=lexer)
-    
-    return aux
-    
 
 
 
