@@ -97,14 +97,14 @@ def build_everything(node, parent_item):
         give_types(node)
         update_lines()
         assign_values(node)
-        for error in errorSem:
-            print(error)
+        #for error in errorSem:
+        #    print(error)
 
 def register_error(varia, message):
     errorSem.append(f'{varia}: {message}')
     error_message = f"{varia}: {message}"
 
-    print(errorSem)
+    #print(errorSem)
 
     with open('ErroreSem.txt', 'a') as file:
         file.write(error_message + "\n")
@@ -293,7 +293,7 @@ def open_file():
     if file_path:
         global file_path_save
         file_path_save = file_path
-        print(file_path_save)
+        #print(file_path_save)
         with open(file_path, 'r') as file:
             text = file.read()
             text_box.setPlainText(text)
@@ -409,10 +409,301 @@ def save_errors_to_file(errors, file_path):
         for error in errors:
             file.write(f"Line {error[0]}: {error[1]}\n")
             aux += "Line" + str(error[0]) + ":" + error[1] + "\n" 
-    print(aux)
+    #print(aux)
     errors.clear()
 
+def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_counter=1):
+    if node is None:
+        return contador_temp, label_counter
     
+    if node.tipo == 'Error':
+        return contador_temp, label_counter
+    
+    #print(node.name)
+    
+    if node.name in compSymb or node.name in artSymb:
+        for child in node.children:
+            contador_temp, label_counter = generar_codigo_tres_direcciones(child, cuartetos, contador_temp, label_counter)
+        # Operaciones binarias
+        operador = node.name
+        operando1 = node.children[0].name if node.children[0].tipo != 'Error' else 'Error'
+        operando2 = node.children[1].name if node.children[1].tipo != 'Error' else 'Error'
+        
+        # Cuarteto para la operación
+        temp_var = f"t{contador_temp}"
+        cuartetos.append(f"({operador}, {operando1}, {operando2}, {temp_var})")
+        contador_temp += 1
+        node.valor = temp_var  # Asignamos el valor temporal al nodo
+        
+    elif node.name == 'Assign':     
+        for child in node.children:
+            contador_temp, label_counter = generar_codigo_tres_direcciones(child, cuartetos, contador_temp, label_counter)
+        operando1 = node.children[0].valor if node.children[0].tipo != 'Error' else 'Error'
+        operando2 = node.children[1].valor if node.children[1].tipo != 'Error' else 'Error'
+        cuartetos.append(f"(=, {operando1}, {operando2}, {node.children[0].name})")
+
+    elif node.name == 'If':
+        contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[0], cuartetos, contador_temp, label_counter)
+        temp_var = f"l{label_counter}"
+        temp_val = f"t{contador_temp - 1}"
+        cuartetos.append(f"(if_false, , {temp_val}, {temp_var})")
+        contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[1], cuartetos, contador_temp, label_counter)
+        label_counter += 1  
+        cuartetos.append(f"(label, , , {temp_var})")
+    
+    elif node.name == 'IfElse':
+        contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[0], cuartetos, contador_temp, label_counter)
+        temp_var = f"l{label_counter}"
+        temp_val = f"t{contador_temp - 1}"
+        cuartetos.append(f"(if_false, , {temp_val}, {temp_var})")
+        contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[1], cuartetos, contador_temp, label_counter)
+        label_counter += 1  
+        temp_var2 = f"l{label_counter}"
+        cuartetos.append(f"(jmp, , , {temp_var2})")
+        cuartetos.append(f"(label, , , {temp_var})")
+        label_counter += 1  
+        contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[2], cuartetos, contador_temp, label_counter)
+        cuartetos.append(f"(label, , , {temp_var2})")
+
+    elif node.name == 'While':
+        temp_var = f"l{label_counter}"
+        cuartetos.append(f"(label, , , {temp_var})")
+        label_counter += 1
+        contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[0], cuartetos, contador_temp, label_counter)
+        temp_var2 = f"l{label_counter}"
+        temp_val = f"t{contador_temp - 1}"
+        cuartetos.append(f"(if_false, , {temp_val}, {temp_var2})")
+        label_counter += 1
+        contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[1], cuartetos, contador_temp, label_counter)
+        cuartetos.append(f"(jmp, , , {temp_var})")
+        cuartetos.append(f"(label, , , {temp_var2})")
+    elif node.name == 'Cin':  # Manejo de entrada
+        # Iterar sobre los hijos para obtener las variables a leer
+        for child in node.children:
+            cuartetos.append(f"(input, , , {child.name})")
+
+    elif node.name == 'Cout':  # Manejo de salida
+    # Iterar sobre los hijos para imprimir sus valores
+        for child in node.children:
+            contador_temp, label_counter = generar_codigo_tres_direcciones(child, cuartetos, contador_temp, label_counter)
+            valor = child.valor if child.tipo != 'Error' else 'Error'
+            cuartetos.append(f"(print, , , {valor})")
+
+    
+    # elif node.name == 'DoWhile':
+    #     temp_var = f"l{label_counter}"
+    #     cuartetos.append(f"(label, , , {temp_var})")
+    #     label_counter += 1
+    #     contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[1], cuartetos, contador_temp, label_counter)
+    #     temp_var2 = f"l{label_counter}"
+    #     temp_val = f"t{contador_temp - 1}"
+    #     cuartetos.append(f"(if_false, , {temp_val}, {temp_var2})")
+    #     label_counter += 1
+    #     cuartetos.append(f"(jmp, , , {temp_var})")
+    #     cuartetos.append(f"(label, , , {temp_var2})")
+
+    else:
+        for child in node.children:
+            contador_temp, label_counter = generar_codigo_tres_direcciones(child, cuartetos, contador_temp, label_counter)
+    return contador_temp, label_counter
+
+# Función para guardar el código generado en un archivo de texto
+def guardar_codigo_tres_direcciones(cuartetos, file_path='codigo_tres_direcciones.txt'):
+    with open(file_path, 'w') as file:
+        for cuarteto in cuartetos:
+            file.write(cuarteto + "\n")
+
+# Llamar a la función desde el análisis semántico (añadir después de la llamada a `build_everything`)
+def generar_y_guardar_codigo_tres_direcciones(res):
+    cuartetos = []
+    contador_temp = 1
+    # Generar cuartetos para el árbol de sintaxis
+    contador_temp = generar_codigo_tres_direcciones(res[1], cuartetos, contador_temp)
+    
+    # Guardar los cuartetos en un archivo
+    guardar_codigo_tres_direcciones(cuartetos)
+
+    print("Código de tres direcciones generado y guardado en 'codigo_tres_direcciones.txt'")
+    eliminar_codigos_con_error()
+
+def eliminar_codigos_con_error(nombre_archivo='codigo_tres_direcciones.txt'):
+    try:
+        # Leer el archivo
+        with open(nombre_archivo, 'r', encoding='utf-8') as archivo:
+            lineas = archivo.readlines()
+
+        # Filtrar las líneas que NO contienen el error de asignación
+        lineas_filtradas = [linea for linea in lineas if "Error de asignacion" not in linea]
+        lineas_filtradas = [linea for linea in lineas if "Error" not in linea]
+        # Reescribir el archivo con las líneas filtradas
+        with open(nombre_archivo, 'w', encoding='utf-8') as archivo:
+            archivo.writelines(lineas_filtradas)
+        
+        print(f"Se han eliminado los registros de error de asignación en {nombre_archivo}.")
+    except Exception as e:
+        print(f"Error al procesar el archivo: {e}")
+
+    aux = ""
+    try:
+        with open('codigo_tres_direcciones.txt', 'r', encoding='utf-8') as file:
+            aux += file.read()
+    except FileNotFoundError:
+            aux += "codigo_tres_direcciones.txt no encontrado.\n"
+    tab_widget_1.widget(4).layout.itemAt(0).widget().setText(aux)
+
+def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archivo_salida='resultado_variables.txt'):
+    cuartetos = []
+    etiquetas = {}  
+    variables = {}  
+
+    # Leer el archivo y procesar las instrucciones
+    with open(archivo_entrada, 'r') as file:
+        for linea in file.readlines():
+            linea = linea.strip()
+            if linea.startswith('(') and linea.endswith(')'):
+                cuarteto = linea[1:-1].split(', ')
+                cuartetos.append(cuarteto)
+                if cuarteto[0] == 'label':
+                    etiquetas[cuarteto[3]] = len(cuartetos) - 1  # Guardamos la posición del cuarteto con la etiqueta
+
+    i = 0  # Inicia el índice para recorrer los cuartetos
+    while i < len(cuartetos):
+        cuarteto = cuartetos[i]
+        operando1 = cuarteto[1]
+        operando2 = cuarteto[2]
+        resultado = cuarteto[3]
+        
+        try:
+            operando1 = int(operando1)
+        except:
+            try:
+                operando1 = float(operando1)
+            except:
+                if(operando1 != ''):
+                    variables[operando1] = 0
+
+        try:
+            operando2 = int(operando2)
+        except:
+            try:
+                operando2 = float(operando2)
+            except:
+                if(operando2 != ''):
+                    variables[operando2] = 0
+
+        variables[resultado] = 0
+        i += 1
+
+    i = 0
+    while i < len(cuartetos):
+        cuarteto = cuartetos[i]
+        operador = cuarteto[0]
+        operando1 = cuarteto[1]
+        operando2 = cuarteto[2]
+        resultado = cuarteto[3]
+
+        print(f"cuartetos: {cuarteto}" )
+        
+        try:
+            operando1 = variables[operando1]
+        except:
+            try:
+                operando1 = int(operando1)
+            except:
+                try:
+                    operando1 = float(operando1)
+                except:
+                    print("algo trono")
+        try:
+            operando2 = variables[operando2]
+        except:
+            try:
+                operando2 = int(operando2)
+            except:
+                try:
+                    operando2 = float(operando2)
+                except:
+                    print("algo trono")
+
+        # Operación de suma
+        if operador == '+':
+            variables[resultado] = int(operando1) + int(operando2)
+
+        # Operación de resta
+        elif operador == '-':
+            variables[resultado] = int(operando1) - int(operando2)
+
+        # Operación de multiplicación
+        elif operador == '*':
+            variables[resultado] = int(operando1) * int(operando2)
+
+        # Operación de división
+        elif operador == '/':
+            # Asegurarse de que no se divida entre cero
+            if int(operando2) != 0:
+                variables[resultado] = int(operando1) / int(operando2)
+            else:
+                print("Error: División por cero.")
+                variables[resultado] = 0  # Asignar un valor por defecto en caso de error
+
+        # Asignación de valor a una variable
+        elif operador == '=':
+            variables[resultado] = operando2  # Si no existe, asignar 0
+
+        elif operador == '==':
+            variables[resultado] = 1 if (operando1) == (operando2) else 0
+        # Comparación mayor que
+        elif operador == '>':
+            variables[resultado] = 1 if (operando1) > (operando2) else 0
+        # Comparación menor que
+        elif operador == '<':
+            variables[resultado] = 1 if (operando1) < (operando2) else 0
+        elif operador == '>=':
+            variables[resultado] = 1 if (operando1) >= (operando2) else 0
+        # Comparación menor que
+        elif operador == '<=':
+            variables[resultado] = 1 if (operando1) <= (operando2) else 0
+        # Operador AND lógico (&&)
+        elif operador == '&&':
+            variables[resultado] = 1 if (operando1 == 1 and operando2 == 1) else 0
+        # Operador OR lógico (||)
+        elif operador == '||':
+            variables[resultado] = 1 if (operando1 == 1 or operando2 == 1) else 0
+
+        # Si la condición es falsa (if_false), saltamos a la etiqueta
+        elif operador == 'if_false':
+            if operando2 == 0:  # Si operando2 es falso (0), se salta a la etiqueta
+                i = etiquetas.get(resultado, i)  # Saltar a la etiqueta indicada por el resultado
+                continue  # Saltar al siguiente ciclo del while
+
+        # Salto incondicional (jmp)
+        elif operador == 'jmp':
+            i = etiquetas.get(resultado, i)  # Establecer el índice a la etiqueta indicada
+            continue  # Saltar al siguiente ciclo del while
+
+        # Marca de etiqueta, no hacer nada
+        elif operador == 'label':
+            pass
+
+        # Entrada de datos (en este caso solo imprimimos un mensaje)
+        elif operador == 'input':
+            print(f"Input")
+            pass
+
+        # Impresión de resultados (en este caso solo imprimimos un mensaje)
+        elif operador == 'print':
+            print(f"Output")  
+            pass  
+
+        # Caso de operador desconocido
+        else:
+            print(f"Operador desconocido: {operador}")
+    
+        i += 1  # Continuar con el siguiente cuarteto, si no hay saltos
+
+    # Mostrar el estado final de las variables
+    print("Estado final de las variables:", variables)
+
 def sint_anal():
     limpia()
     text = text_box.toPlainText()
@@ -427,8 +718,8 @@ def sint_anal():
     global tabla_simbolos
     tabla_simbolos_lineas = TablaDeSimbolos()
     tabla_simbolos_lineas = returnreslineas(text)
-    # Mostrar la tabla de símbolos y obtener su contenido
 
+    # Mostrar la tabla de símbolos y obtener su contenido
     for nombre, simbolo in tabla_simbolos.tabla.items():
         if(tabla_simbolos_lineas.existe_simbolo(nombre)):
             tabla_simbolos.obtener_simbolo(nombre).lineas = tabla_simbolos_lineas.obtener_simbolo(nombre).lineas
@@ -444,14 +735,16 @@ def sint_anal():
     global errorSem
     errorSem = []
 
-    #Errores
     MostError()
-    
-    save_tree_to_file(res[1], "ast.txt") 
+
+    save_tree_to_file(res[1], "ast.txt")
     save_errors_to_file(res[0], "syntax_errors.txt")
 
+    generar_y_guardar_codigo_tres_direcciones(res)
+    leer_y_ejecutar_codigo()
+
 def build_tree(node, parent_item, tree_widget, show_details):
-    print(node)
+    #print(node)
     if node is None:
         return
     

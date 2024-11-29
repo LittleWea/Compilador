@@ -248,11 +248,11 @@ def p_statements(p):
 
 def p_statement(p):
     '''statement : compound_statement
+                 | cin_statement
+                 | cout_statement
                  | assign_statement
                  | select_statement
                  | iteration_statement
-                 | cin_statement
-                 | cout_statement
                  | switch_statement
                  | doublefacts'''
     p[0] = p[1]
@@ -458,6 +458,7 @@ main {
             cin mas;
         }
     }
+    cout mas;
     
 }
 '''

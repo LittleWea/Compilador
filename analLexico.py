@@ -100,7 +100,7 @@ def tipoToken(expresion):
             patron_operadores_logicos
         ])
 
-    if( (expresion == 'if') | (expresion == 'othewise') | (expresion == 'do') | (expresion == 'while') | 
+    if( (expresion == 'if') | (expresion == 'otherwise') | (expresion == 'do') | (expresion == 'while') | 
        (expresion == 'switch') | (expresion == 'case') | (expresion == 'integer') | (expresion == 'double') | 
        (expresion == 'main') | (expresion == 'return') | (expresion == 'else') | (expresion == 'cin') | (expresion == 'cout')):
         return 'palabra reservada'
