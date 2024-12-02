@@ -248,11 +248,11 @@ def p_statements(p):
 
 def p_statement(p):
     '''statement : compound_statement
-                 | cin_statement
-                 | cout_statement
                  | assign_statement
                  | select_statement
                  | iteration_statement
+                 | cin_statement
+                 | cout_statement
                  | switch_statement
                  | doublefacts'''
     p[0] = p[1]
@@ -361,8 +361,7 @@ def p_factor(p):
 
 def p_pot_operator(p):
     '''pot_operator : POW'''
-    p[0] = Node(p[1])
-
+    p[0] = str(p[1])
 
 def p_doublefacts(p):
     '''doublefacts : IDENTIFIER SUMDOUBLE DOTCOMMA
@@ -421,6 +420,7 @@ parser = yacc.yacc()
 data = '''
 main {
     integer x,y,z;
+    y=2^3;
     #suma=45;
     x=32.32;
     x=23;
@@ -458,7 +458,6 @@ main {
             cin mas;
         }
     }
-    cout mas;
     
 }
 '''
