@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QApplication, QLabel, QDialog, QLineEdit,QWidget,QFormLayout, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog, QScrollArea, QTreeWidget, QTreeWidgetItem, QMessageBox
+from PyQt5.QtWidgets import QApplication, QLabel, QMessageBox, QDialog, QLineEdit,QWidget,QFormLayout, QVBoxLayout, QComboBox, QTextEdit, QTabWidget, QHBoxLayout, QPushButton, QFileDialog, QScrollArea, QTreeWidget, QTreeWidgetItem
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon, QFont, QFontDatabase, QWheelEvent
 from PyQt5.QtMultimedia import QMediaPlayer, QMediaContent
@@ -60,6 +60,7 @@ class InputDialog(QDialog):
             super().accept()  
         except ValueError as e:
             QMessageBox.warning(self, "Error de entrada", str(e))
+
 
 class Simbolo:
     def __init__(self, nombre, tipo, valor=None, loc=0):
@@ -478,14 +479,36 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
         
         # Cuarteto para la operación
         temp_var = f"t{contador_temp}"
-        if(operando1 in artSymb):
-            if(contador_temp-2<=0):
-                operando1 = f"t{contador_temp-1}"
-            else:
-                operando1 = f"t{contador_temp-2}"
+        
+        aux_contador = contador_temp - 1
+        
+        if operando1 in artSymb:
+            bandera = True
+            while bandera == True:
+                bandera = False
+                if cuartetos == []:
+                    break
+                for cuarteto in reversed(cuartetos):
+                    cuarteto = cuarteto[1:-1].split(', ')
+                    if cuarteto[1] == f"t{aux_contador}":
+                        aux_contador -= 1
+                        bandera = True
+            operando1 = f"t{aux_contador}"
 
-        if(operando2 in artSymb):
-            operando2 = f"t{contador_temp-1}"
+        aux_contador = contador_temp - 1
+        if operando2 in artSymb:
+            bandera = True
+            while bandera == True:
+                bandera = False
+                if cuartetos == []:
+                    break
+                for cuarteto in reversed(cuartetos):
+                    cuarteto = cuarteto[1:-1].split(', ')
+                    if cuarteto[2] == f"t{aux_contador}" or cuarteto[1] == f"t{aux_contador}" or operando1 == f"t{aux_contador}":
+                        aux_contador -= 1
+                        bandera = True
+                
+            operando2 = f"t{aux_contador}"
 
         cuartetos.append(f"({operador}, {operando1}, {operando2}, {temp_var})")
         contador_temp += 1
@@ -703,6 +726,7 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt'):
         # Asignación de valor a una variable
         elif operador == '=':
             tipos = []
+            #aaaaaaaaaaaaaaaaaaaaaa
             try:
                 with open('table.cps', 'r', encoding='utf-8') as file:
                     for line in file:
@@ -756,9 +780,7 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt'):
         elif operador == 'label':
             pass
         # Entrada de datos (en este caso solo imprimimos un mensaje)
-        #aaaaaaaaaaaaaaaaaaaaa
         elif operador == 'input':
-            ########################################################
             tipos = []
             try:
                 with open('table.cps', 'r', encoding='utf-8') as file:
@@ -787,7 +809,7 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt'):
                 for var, value in dialog.values.items():
                     cuartetos.append(f"(input, , , {var})")  # Registrar en los cuartetos
                     variables[var] = value  #Guardar los valores en el diccionario de variables
-            pass
+            pass  
             # Impresión de resultados (en este caso solo imprimimos un mensaje)
         elif operador == 'print':
             try:
