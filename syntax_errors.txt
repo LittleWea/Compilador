@@ -1,6 +1,0 @@
-Line 81: Unexpected token: 1
-Line 81: Unexpected token: +
-Line 81: Unexpected token: 1
-Line 81: Unexpected token: ;
-Line 82: Unexpected token: cout
-Line 38: Unexpected token: 1

@@ -26,6 +26,7 @@ while(y==0){
        y=y+1;
     }
 cin e;
+cout e;
 }
 
 

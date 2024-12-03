@@ -361,8 +361,7 @@ def p_factor(p):
 
 def p_pot_operator(p):
     '''pot_operator : POW'''
-    p[0] = Node(p[1])
-
+    p[0] = str(p[1])
 
 def p_doublefacts(p):
     '''doublefacts : IDENTIFIER SUMDOUBLE DOTCOMMA
@@ -421,6 +420,7 @@ parser = yacc.yacc()
 data = '''
 main {
     integer x,y,z;
+    y=2^3;
     #suma=45;
     x=32.32;
     x=23;

@@ -105,7 +105,10 @@ class TablaDeSimbolos:
         with open(nombre_archivo, 'w') as archivo:
             for nombre, simbolo in self.tabla.items():
                 archivo.write(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}\n")
-  
+    def abrirArchivo(self, nombre_archivo):
+         with open(nombre_archivo, 'r') as archivo:
+            for nombre, simbolo in self.tabla.items():
+                archivo.read(f"{nombre}: tipo={simbolo.tipo}, valor={simbolo.valor}, lineas={simbolo.lineas}\n")
 # Ejemplo de uso de la tabla de símbolos
 tabla_simbolos = TablaDeSimbolos()
 tabla_simbolos_lineas = TablaDeSimbolos()
@@ -457,9 +460,6 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
     
     if node.tipo == 'Error':
         return contador_temp, label_counter
-    
-    #print(node.name)
-    
     if node.name in compSymb or node.name in artSymb:
         for child in node.children:
             contador_temp, label_counter = generar_codigo_tres_direcciones(child, cuartetos, contador_temp, label_counter)
@@ -470,6 +470,15 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
         
         # Cuarteto para la operación
         temp_var = f"t{contador_temp}"
+        if(operando1 in artSymb):
+            if(contador_temp-2<=0):
+                operando1 = f"t{contador_temp-1}"
+            else:
+                operando1 = f"t{contador_temp-2}"
+
+        if(operando2 in artSymb):
+            operando2 = f"t{contador_temp-1}"
+
         cuartetos.append(f"({operador}, {operando1}, {operando2}, {temp_var})")
         contador_temp += 1
         node.valor = temp_var  # Asignamos el valor temporal al nodo
@@ -480,7 +489,6 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
         operando1 = node.children[0].valor if node.children[0].tipo != 'Error' else 'Error'
         operando2 = node.children[1].valor if node.children[1].tipo != 'Error' else 'Error'
         cuartetos.append(f"(=, {operando1}, {operando2}, {node.children[0].name})")
-
     elif node.name == 'If':
         contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[0], cuartetos, contador_temp, label_counter)
         temp_var = f"l{label_counter}"
@@ -489,7 +497,6 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
         contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[1], cuartetos, contador_temp, label_counter)
         label_counter += 1  
         cuartetos.append(f"(label, , , {temp_var})")
-    
     elif node.name == 'IfElse':
         contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[0], cuartetos, contador_temp, label_counter)
         temp_var = f"l{label_counter}"
@@ -503,7 +510,6 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
         label_counter += 1  
         contador_temp, label_counter = generar_codigo_tres_direcciones(node.children[2], cuartetos, contador_temp, label_counter)
         cuartetos.append(f"(label, , , {temp_var2})")
-
     elif node.name == 'While':
         temp_var = f"l{label_counter}"
         cuartetos.append(f"(label, , , {temp_var})")
@@ -517,23 +523,16 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
         cuartetos.append(f"(jmp, , , {temp_var})")
         cuartetos.append(f"(label, , , {temp_var2})")
     elif node.name == 'Cin':  # Manejo de entrada
-        variables_cin = [child.name for child in node.children]  # Extraer nombres de variables
-        dialog = InputDialog(variables_cin)  # Crear el diálogo
-        
-        if dialog.exec_() == QDialog.Accepted:  # Mostrar el diálogo y esperar confirmación
-            for var, value in dialog.values.items():
-                cuartetos.append(f"(input, , , {var})")  # Registrar en los cuartetos
-                variables[var] = value  # Guardar los valores en el diccionario de variables
-
-
+        cuartetos.append(f"(input, , , {node.children[0].name})")  # Registrar en los cuartetos
     elif node.name == 'Cout':  # Manejo de salida
-    # Iterar sobre los hijos para imprimir sus valores
+        # Iterar sobre los hijos para imprimir sus valores
         for child in node.children:
             contador_temp, label_counter = generar_codigo_tres_direcciones(child, cuartetos, contador_temp, label_counter)
-            valor = child.valor if child.tipo != 'Error' else 'Error'
-            cuartetos.append(f"(print, , , {valor})")
+            valor = child.name if child.tipo != 'Error' else 'Error'
+            if(valor in artSymb):
+                valor = f"t{contador_temp-1}"
 
-    
+            cuartetos.append(f"(print, , , {valor})")
     # elif node.name == 'DoWhile':
     #     temp_var = f"l{label_counter}"
     #     cuartetos.append(f"(label, , , {temp_var})")
@@ -545,7 +544,6 @@ def generar_codigo_tres_direcciones(node, cuartetos, contador_temp=1, label_coun
     #     label_counter += 1
     #     cuartetos.append(f"(jmp, , , {temp_var})")
     #     cuartetos.append(f"(label, , , {temp_var2})")
-
     else:
         for child in node.children:
             contador_temp, label_counter = generar_codigo_tres_direcciones(child, cuartetos, contador_temp, label_counter)
@@ -595,7 +593,10 @@ def eliminar_codigos_con_error(nombre_archivo='codigo_tres_direcciones.txt'):
             aux += "codigo_tres_direcciones.txt no encontrado.\n"
     tab_widget_1.widget(4).layout.itemAt(0).widget().setText(aux)
 
-def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archivo_salida='resultado_variables.txt'):
+
+def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt'):
+    global Res
+    Res = " "
     cuartetos = []
     etiquetas = {}  
     variables = {}  
@@ -616,7 +617,7 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archiv
         operando1 = cuarteto[1]
         operando2 = cuarteto[2]
         resultado = cuarteto[3]
-        
+
         try:
             operando1 = int(operando1)
         except:
@@ -647,7 +648,7 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archiv
         resultado = cuarteto[3]
 
         print(f"cuartetos: {cuarteto}" )
-        
+
         try:
             operando1 = variables[operando1]
         except:
@@ -657,7 +658,7 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archiv
                 try:
                     operando1 = float(operando1)
                 except:
-                    print("algo trono")
+                    print(".")
         try:
             operando2 = variables[operando2]
         except:
@@ -667,32 +668,53 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archiv
                 try:
                     operando2 = float(operando2)
                 except:
-                    print("algo trono")
+                    print(".")
 
         # Operación de suma
         if operador == '+':
-            variables[resultado] = int(operando1) + int(operando2)
-
+            variables[resultado] = operando1 + operando2
         # Operación de resta
         elif operador == '-':
-            variables[resultado] = int(operando1) - int(operando2)
-
+            variables[resultado] = operando1 - operando2
         # Operación de multiplicación
         elif operador == '*':
-            variables[resultado] = int(operando1) * int(operando2)
-
+            variables[resultado] = operando1 * operando2
         # Operación de división
         elif operador == '/':
             # Asegurarse de que no se divida entre cero
             if int(operando2) != 0:
-                variables[resultado] = int(operando1) / int(operando2)
+                variables[resultado] = operando1 / operando2
             else:
                 print("Error: División por cero.")
                 variables[resultado] = 0  # Asignar un valor por defecto en caso de error
-
+        elif operador == '%':
+            variables[resultado] = operando1 % operando2
+        elif operador == '^':
+            variables[resultado] = operando1 ** operando2
         # Asignación de valor a una variable
         elif operador == '=':
-            variables[resultado] = operando2  # Si no existe, asignar 0
+            tipos = []
+            #aaaaaaaaaaaaaaaaaaaaaa
+            try:
+                with open('table.cps', 'r', encoding='utf-8') as file:
+                    for line in file:
+                        match = re.match(r"(\w+):\s*tipo=([\w\d]+),", line)
+                        if match:
+                            variable = match.group(1)  
+                            tipo = match.group(2)
+                            print("-------------------")
+                            print(variable + tipo )
+                            print(operando2)
+                            if(tipo == "integer" and variable == resultado):
+                                print("its in")
+                                variables[resultado] = int(operando2)
+                            if(tipo == "double" and variable == resultado):
+                                print("Te gusta doubleada")
+                                variables[resultado] = float(operando2)
+                            print(variables)
+                            tipos.append((variable, tipo))  # Almacenamos en la lista
+            except:
+                print(".")
 
         elif operador == '==':
             variables[resultado] = 1 if (operando1) == (operando2) else 0
@@ -713,32 +735,41 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archiv
         # Operador OR lógico (||)
         elif operador == '||':
             variables[resultado] = 1 if (operando1 == 1 or operando2 == 1) else 0
-
         # Si la condición es falsa (if_false), saltamos a la etiqueta
         elif operador == 'if_false':
             if operando2 == 0:  # Si operando2 es falso (0), se salta a la etiqueta
                 i = etiquetas.get(resultado, i)  # Saltar a la etiqueta indicada por el resultado
                 continue  # Saltar al siguiente ciclo del while
-
         # Salto incondicional (jmp)
         elif operador == 'jmp':
             i = etiquetas.get(resultado, i)  # Establecer el índice a la etiqueta indicada
             continue  # Saltar al siguiente ciclo del while
-
         # Marca de etiqueta, no hacer nada
         elif operador == 'label':
             pass
-
         # Entrada de datos (en este caso solo imprimimos un mensaje)
         elif operador == 'input':
-            if resultado not in variables:
-                variables[resultado] = 0  # Si no tiene valor inicial, asigna un predeterminado
-            print(f"Ingrese valor para {resultado}: {variables[resultado]}")  # O utiliza un cuadro de diálogo si es necesario
-
-
-        # Impresión de resultados (en este caso solo imprimimos un mensaje)
+            variables_cin = [resultado]  # Extraer nombres de variables
+            dialog = InputDialog(variables_cin)  # Crear el diálogo
+            if dialog.exec_() == QDialog.Accepted:  # Mostrar el diálogo y esperar confirmación
+                for var, value in dialog.values.items():
+                    cuartetos.append(f"(input, , , {var})")  # Registrar en los cuartetos
+                    variables[var] = value  # Guardar los valores en el diccionario de variables
+            pass  
+            # Impresión de resultados (en este caso solo imprimimos un mensaje)
         elif operador == 'print':
-            print(f"Output")  
+            try:
+                Res += str(variables[resultado]) + "\n"
+            except:
+                try:
+                    Res += str(resultado) + "\n"
+                except:
+                    try:
+                       Res += str(resultado) + "\n"
+                    except:
+                        print(".")
+            print("Res: ")
+            print(Res)
             pass  
 
         # Caso de operador desconocido
@@ -746,6 +777,8 @@ def leer_y_ejecutar_codigo(archivo_entrada='codigo_tres_direcciones.txt', archiv
             print(f"Operador desconocido: {operador}")
     
         i += 1  # Continuar con el siguiente cuarteto, si no hay saltos
+    
+    tab_widget_2.widget(1).layout.itemAt(0).widget().setText(Res)
 
     # Mostrar el estado final de las variables
     print("Estado final de las variables:", variables)
